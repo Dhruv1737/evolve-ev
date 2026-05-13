@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="EVOLVE — Driving the future of electric mobility. Join us for EV Day: Vidyut 26." />
+    <title>EVOLVE — EV Day | Vidyut 26</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Orbitron:wght@400;500;600;700;800;900&family=Exo+2:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300&family=Space+Mono:wght@400;700&display=swap"
+      rel="stylesheet"
+    />
+
+    <style>
+      html { background-color: #050a05; overflow-x: hidden; }
+
+      #loader {
+        position: fixed;
+        inset: 0;
+        background: #050a05;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        z-index: 99999;
+        transition: opacity 0.6s ease, visibility 0.6s ease;
+      }
+      #loader.hidden { opacity: 0; visibility: hidden; }
+      #loader img {
+        width: 120px;
+        animation: loaderPulse 1.2s ease-in-out infinite;
+      }
+      #loader-bar {
+        margin-top: 32px;
+        width: 200px;
+        height: 2px;
+        background: rgba(46, 204, 55, 0.15);
+        border-radius: 2px;
+        overflow: hidden;
+      }
+      #loader-bar-fill {
+        height: 100%;
+        background: linear-gradient(90deg, #1e8426, #2ecc37, #00ff41);
+        animation: loaderFill 1.8s ease-in-out forwards;
+      }
+      #loader-text {
+        margin-top: 16px;
+        font-family: 'Space Mono', monospace;
+        font-size: 0.65rem;
+        color: rgba(46, 204, 55, 0.6);
+        letter-spacing: 0.3em;
+        text-transform: uppercase;
+        animation: loaderBlink 1s ease infinite;
+      }
+      @keyframes loaderPulse {
+        0%, 100% { filter: drop-shadow(0 0 10px rgba(46,204,55,0.4)); }
+        50%       { filter: drop-shadow(0 0 28px rgba(46,204,55,0.9)); }
+      }
+      @keyframes loaderFill {
+        0%   { width: 0%; }
+        100% { width: 100%; }
+      }
+      @keyframes loaderBlink {
+        0%, 100% { opacity: 1; }
+        50%       { opacity: 0.3; }
+      }
+    </style>
+  </head>
+
+  <body>
+    <div id="loader">
+      <img src="https://evolve.nitb.in/Evolve_Logo.png" alt="EVOLVE" />
+      <div id="loader-bar">
+        <div id="loader-bar-fill"></div>
+      </div>
+      <div id="loader-text">Initializing Vidyut 26...</div>
+    </div>
+
+    <div id="root"></div>
+    <script type="module" src="/src/main.jsx"></script>
+
+    <script>
+      window.addEventListener('load', function () {
+        setTimeout(function () {
+          var loader = document.getElementById('loader');
+          if (loader) loader.classList.add('hidden');
+        }, 2000);
+      });
+    </script>
+  </body>
+</html>
