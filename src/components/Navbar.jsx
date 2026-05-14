@@ -1,172 +1,151 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 
-const NAV_LINKS = [
+var NAV_LINKS = [
   { label: 'Home',      path: '/' },
-  { label: 'Vidyut-26', path: '/vidyut-26' },
+  { label: 'Vidyut 26', path: '/vidyut-26' },
   { label: 'Founders',  path: '/founders' },
   { label: 'About',     path: '/about' },
 ];
 
 export default function Navbar() {
-  const location  = useLocation();
-  const [scrolled,     setScrolled]     = useState(false);
-  const [menuOpen,     setMenuOpen]     = useState(false);
-  const [activeIndex,  setActiveIndex]  = useState(0);
-  const indicatorRef = useRef(null);
-  const navLinksRef  = useRef([]);
+  var location   = useLocation();
+  var scrolled   = useState(false);
+  var isScrolled     = scrolled[0];
+  var setScrolled    = scrolled[1];
 
-  // ── Shrink navbar on scroll ──
-  useEffect(() => {
-    const onScroll = () => setScrolled(window.scrollY > 40);
-    window.addEventListener('scroll', onScroll);
-    return () => window.removeEventListener('scroll', onScroll);
+  var menuState  = useState(false);
+  var menuOpen       = menuState[0];
+  var setMenuOpen    = menuState[1];
+
+  var indicatorRef = useRef(null);
+  var linkRefs     = useRef([]);
+
+  // ── Scroll detection ──
+  useEffect(function() {
+    function onScroll() { setScrolled(window.scrollY > 60); }
+    window.addEventListener('scroll', onScroll, { passive: true });
+    return function() { window.removeEventListener('scroll', onScroll); };
   }, []);
 
-  // ── Track active link ──
-  useEffect(() => {
-    const idx = NAV_LINKS.findIndex(l => l.path === location.pathname);
-    setActiveIndex(idx >= 0 ? idx : 0);
+  // ── Close menu on route change ──
+  useEffect(function() {
     setMenuOpen(false);
   }, [location.pathname]);
 
-  // ── Move sliding indicator under active link ──
-  useEffect(() => {
-    const el = navLinksRef.current[activeIndex];
-    const indicator = indicatorRef.current;
+  // ── Lock body scroll ──
+  useEffect(function() {
+    document.body.style.overflow = menuOpen ? 'hidden' : '';
+    return function() { document.body.style.overflow = ''; };
+  }, [menuOpen]);
+
+  // ── Slide indicator ──
+  useEffect(function() {
+    var activeIdx = NAV_LINKS.findIndex(function(l) {
+      return l.path === location.pathname;
+    });
+    var el        = linkRefs.current[activeIdx];
+    var indicator = indicatorRef.current;
     if (el && indicator) {
       indicator.style.left  = el.offsetLeft + 'px';
       indicator.style.width = el.offsetWidth + 'px';
     }
-  }, [activeIndex]);
-
-  // ── Lock body scroll when mobile menu open ──
-  useEffect(() => {
-    document.body.style.overflow = menuOpen ? 'hidden' : '';
-    return () => { document.body.style.overflow = ''; };
-  }, [menuOpen]);
+  }, [location.pathname]);
 
   return (
     <>
+      {/* ── Main nav ── */}
       <nav style={{
-        position: 'fixed',
+        position:        'fixed',
         top: 0, left: 0, right: 0,
-        zIndex: 9000,
-        padding: scrolled ? '10px 0' : '18px 0',
-        background: scrolled
-          ? 'rgba(5, 10, 5, 0.92)'
-          : 'rgba(5, 10, 5, 0.4)',
-        backdropFilter:         'blur(20px)',
-        WebkitBackdropFilter:   'blur(20px)',
-        borderBottom: scrolled
-          ? '1px solid rgba(46,204,55,0.15)'
-          : '1px solid transparent',
-        transition: 'all 0.4s cubic-bezier(0.25,0.46,0.45,0.94)',
-        boxShadow: scrolled
-          ? '0 4px 40px rgba(0,0,0,0.6)'
-          : 'none',
+        zIndex:          8000,
+        padding:         isScrolled ? '14px 0' : '22px 0',
+        background:      isScrolled
+          ? 'rgba(12,12,14,0.88)'
+          : 'transparent',
+        backdropFilter:  isScrolled ? 'blur(20px)' : 'none',
+        WebkitBackdropFilter: isScrolled ? 'blur(20px)' : 'none',
+        transition:      'all 0.5s cubic-bezier(0.25,0.46,0.45,0.94)',
       }}>
+
+        {/* Glass reflection line */}
+        <div style={{
+          position:   'absolute',
+          bottom: 0, left: 0, right: 0,
+          height:     '1px',
+          background: 'linear-gradient(90deg, transparent 0%, rgba(184,115,51,0.25) 30%, rgba(255,255,255,0.06) 50%, rgba(184,115,51,0.25) 70%, transparent 100%)',
+          opacity:    isScrolled ? 1 : 0,
+          transition: 'opacity 0.5s ease',
+        }} />
+
         <div className="container" style={{
-          display: 'flex',
-          alignItems: 'center',
+          display:        'flex',
+          alignItems:     'center',
           justifyContent: 'space-between',
         }}>
 
           {/* ── Logo ── */}
-          <Link to="/" style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-            <div style={{ position: 'relative' }}>
-              {/* Glow ring behind logo */}
-              <div style={{
-                position: 'absolute',
-                inset: -6,
-                borderRadius: '50%',
-                background: 'radial-gradient(circle, rgba(46,204,55,0.15) 0%, transparent 70%)',
-                animation: 'pulse-glow 3s ease infinite',
-              }} />
-              <img
-                src="https://evolve.nitb.in/Evolve_Logo.png"
-                alt="EVOLVE"
-                style={{
-                  height: scrolled ? 38 : 46,
-                  width: 'auto',
-                  position: 'relative',
-                  zIndex: 1,
-                  transition: 'height 0.4s ease',
-                  filter: 'drop-shadow(0 0 8px rgba(46,204,55,0.4))',
-                }}
-              />
-            </div>
-            <div>
-              <div style={{
-                fontFamily: 'var(--font-display)',
-                fontSize: scrolled ? '1.4rem' : '1.7rem',
-                color: 'var(--green-400)',
-                letterSpacing: '0.12em',
-                lineHeight: 1,
-                transition: 'font-size 0.4s ease',
-                textShadow: '0 0 20px rgba(46,204,55,0.4)',
-              }}>
-                EVOLVE
-              </div>
-              <div style={{
-                fontFamily: 'var(--font-mono)',
-                fontSize: '0.52rem',
-                color: 'var(--text-muted)',
-                letterSpacing: '0.25em',
-                marginTop: 2,
-              }}>
-                EV DAY — VIDYUT 26
-              </div>
-            </div>
+          <Link to="/" style={{
+            display:     'flex',
+            alignItems:  'center',
+            gap:         14,
+            flexShrink:  0,
+          }}>
+            <img
+              src="https://evolve.nitb.in/Evolve_Logo.png"
+              alt="EVOLVE"
+              style={{
+                height:     isScrolled ? 32 : 38,
+                width:      'auto',
+                transition: 'height 0.4s ease',
+                filter:     'brightness(1.1)',
+              }}
+            />
+            
           </Link>
 
-          {/* ── Desktop Links ── */}
+          {/* ── Desktop links ── */}
           <div style={{
-            display: 'flex',
-            alignItems: 'center',
-            gap: 4,
-            position: 'relative',
+            display:     'flex',
+            alignItems:  'center',
+            gap:         4,
+            position:    'relative',
           }}
             className="desktop-nav"
           >
-            {/* Sliding underline indicator */}
+            {/* Sliding indicator */}
             <div ref={indicatorRef} style={{
-              position: 'absolute',
-              bottom: -4,
-              height: 1,
-              background: 'linear-gradient(90deg, transparent, var(--green-400), transparent)',
+              position:   'absolute',
+              bottom:     -4,
+              height:     1,
+              background: 'linear-gradient(90deg, transparent, var(--copper), transparent)',
               transition: 'left 0.4s cubic-bezier(0.25,0.46,0.45,0.94), width 0.4s cubic-bezier(0.25,0.46,0.45,0.94)',
-              boxShadow: '0 0 8px var(--green-400)',
+              opacity:    0.7,
             }} />
 
-            {NAV_LINKS.map((link, i) => {
-              const isActive = location.pathname === link.path;
+            {NAV_LINKS.map(function(link, i) {
+              var isActive = location.pathname === link.path;
               return (
                 <Link
                   key={link.path}
                   to={link.path}
-                  ref={el => navLinksRef.current[i] = el}
+                  ref={function(el) { linkRefs.current[i] = el; }}
                   style={{
-                    fontFamily: 'var(--font-heading)',
-                    fontSize: '0.68rem',
-                    fontWeight: 600,
-                    letterSpacing: '0.14em',
+                    fontFamily:    'var(--font-wide)',
+                    fontSize:      '0.65rem',
+                    fontWeight:    600,
+                    letterSpacing: '0.18em',
                     textTransform: 'uppercase',
-                    color: isActive
-                      ? 'var(--green-400)'
-                      : 'var(--text-secondary)',
-                    padding: '8px 18px',
-                    position: 'relative',
-                    transition: 'color 0.3s ease',
-                    textShadow: isActive
-                      ? '0 0 12px rgba(46,204,55,0.5)'
-                      : 'none',
+                    color:         isActive ? 'var(--pearl)' : 'var(--pearl-muted)',
+                    padding:       '8px 20px',
+                    transition:    'color 0.3s ease',
+                    position:      'relative',
                   }}
-                  onMouseEnter={e => {
-                    if (!isActive) e.currentTarget.style.color = 'var(--green-300)';
+                  onMouseEnter={function(e) {
+                    if (!isActive) e.currentTarget.style.color = 'var(--pearl-dim)';
                   }}
-                  onMouseLeave={e => {
-                    if (!isActive) e.currentTarget.style.color = 'var(--text-secondary)';
+                  onMouseLeave={function(e) {
+                    if (!isActive) e.currentTarget.style.color = 'var(--pearl-muted)';
                   }}
                 >
                   {link.label}
@@ -174,109 +153,127 @@ export default function Navbar() {
               );
             })}
 
-            {/* CTA Button */}
-            <Link to="/vidyut-26" style={{ marginLeft: 16 }}>
-              <button className="btn-glow" style={{ padding: '10px 24px', fontSize: '0.65rem' }}>
-                <span>Register Now</span>
+            {/* CTA */}
+            <Link to="/vidyut-26" style={{ marginLeft: 20 }}>
+              <button className="btn-primary" style={{
+                padding:  '10px 24px',
+                fontSize: '0.6rem',
+              }}>
+                <span>Register</span>
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+                  <path d="M5 12h14M12 5l7 7-7 7"/>
+                </svg>
               </button>
             </Link>
           </div>
 
-          {/* ── Mobile Hamburger ── */}
+          {/* ── Hamburger ── */}
           <button
-            onClick={() => setMenuOpen(o => !o)}
+            onClick={function() { setMenuOpen(function(o) { return !o; }); }}
             className="hamburger"
             style={{
-              display: 'none',
+              display:    'none',
               flexDirection: 'column',
-              gap: 5,
+              gap:        6,
               background: 'none',
-              border: 'none',
-              cursor: 'none',
-              padding: 8,
-              zIndex: 9100,
+              border:     'none',
+              cursor:     'none',
+              padding:    8,
+              zIndex:     9100,
             }}
             aria-label="Toggle menu"
           >
-            {[0, 1, 2].map(i => (
-              <span key={i} style={{
-                display: 'block',
-                width: i === 1 && menuOpen ? 20 : 26,
-                height: 2,
-                background: 'var(--green-400)',
-                borderRadius: 2,
-                transformOrigin: 'center',
-                transition: 'all 0.3s ease',
-                transform:
-                  i === 0 && menuOpen ? 'translateY(7px) rotate(45deg)' :
-                  i === 2 && menuOpen ? 'translateY(-7px) rotate(-45deg)' :
-                  i === 1 && menuOpen ? 'scaleX(0)' : 'none',
-                boxShadow: '0 0 6px rgba(46,204,55,0.4)',
-                marginLeft: i === 1 ? 'auto' : 0,
-              }} />
-            ))}
+            {[0, 1, 2].map(function(i) {
+              return (
+                <span key={i} style={{
+                  display:         'block',
+                  width:           i === 1 ? (menuOpen ? 16 : 24) : 24,
+                  height:          1,
+                  background:      'var(--pearl-dim)',
+                  transition:      'all 0.35s ease',
+                  transformOrigin: 'center',
+                  transform:
+                    i === 0 && menuOpen ? 'translateY(7px) rotate(45deg)' :
+                    i === 2 && menuOpen ? 'translateY(-7px) rotate(-45deg)' :
+                    i === 1 && menuOpen ? 'scaleX(0) translateX(8px)' : 'none',
+                }} />
+              );
+            })}
           </button>
         </div>
       </nav>
 
-      {/* ── Mobile Menu Overlay ── */}
+      {/* ── Mobile overlay ── */}
       <div style={{
-        position: 'fixed',
-        inset: 0,
-        zIndex: 8500,
-        background: 'rgba(5,10,5,0.97)',
-        backdropFilter: 'blur(24px)',
-        display: 'flex',
+        position:      'fixed',
+        inset:         0,
+        zIndex:        7500,
+        background:    'rgba(10,10,11,0.98)',
+        backdropFilter:'blur(24px)',
+        display:       'flex',
         flexDirection: 'column',
-        alignItems: 'center',
-        justifyContent: 'center',
-        gap: 8,
-        opacity: menuOpen ? 1 : 0,
-        pointerEvents: menuOpen ? 'all' : 'none',
-        transition: 'opacity 0.35s ease',
+        alignItems:    'center',
+        justifyContent:'center',
+        gap:           4,
+        opacity:        menuOpen ? 1 : 0,
+        pointerEvents:  menuOpen ? 'all' : 'none',
+        transition:    'opacity 0.4s ease',
       }}>
-        {/* Decorative corner lines */}
-        {['top-left','top-right','bottom-left','bottom-right'].map(corner => (
-          <div key={corner} style={{
-            position: 'absolute',
-            [corner.includes('top')    ? 'top'    : 'bottom']: 32,
-            [corner.includes('left')   ? 'left'   : 'right']:  32,
-            width: 40, height: 40,
-            borderTop:    corner.includes('top')    ? '1px solid rgba(46,204,55,0.3)' : 'none',
-            borderBottom: corner.includes('bottom') ? '1px solid rgba(46,204,55,0.3)' : 'none',
-            borderLeft:   corner.includes('left')   ? '1px solid rgba(46,204,55,0.3)' : 'none',
-            borderRight:  corner.includes('right')  ? '1px solid rgba(46,204,55,0.3)' : 'none',
-          }} />
-        ))}
+
+        {/* Corner accents */}
+        {['tl','tr','bl','br'].map(function(c) {
+          return (
+            <div key={c} style={{
+              position: 'absolute',
+              top:    c.startsWith('t') ? 32 : 'auto',
+              bottom: c.startsWith('b') ? 32 : 'auto',
+              left:   c.endsWith('l')   ? 32 : 'auto',
+              right:  c.endsWith('r')   ? 32 : 'auto',
+              width: 28, height: 28,
+              borderTop:    c.startsWith('t') ? '1px solid rgba(184,115,51,0.25)' : 'none',
+              borderBottom: c.startsWith('b') ? '1px solid rgba(184,115,51,0.25)' : 'none',
+              borderLeft:   c.endsWith('l')   ? '1px solid rgba(184,115,51,0.25)' : 'none',
+              borderRight:  c.endsWith('r')   ? '1px solid rgba(184,115,51,0.25)' : 'none',
+            }} />
+          );
+        })}
 
         <div style={{
-          fontFamily: 'var(--font-mono)',
-          fontSize: '0.6rem',
-          color: 'var(--text-muted)',
-          letterSpacing: '0.3em',
-          marginBottom: 32,
+          fontFamily:    'var(--font-wide)',
+          fontSize:      '0.55rem',
+          fontWeight:    600,
+          letterSpacing: '0.35em',
+          color:         'var(--pearl-ghost)',
+          textTransform: 'uppercase',
+          marginBottom:  40,
         }}>
-          NAVIGATION
+          Navigation
         </div>
 
-        {NAV_LINKS.map((link, i) => {
-          const isActive = location.pathname === link.path;
+        {NAV_LINKS.map(function(link, i) {
+          var isActive = location.pathname === link.path;
           return (
             <Link
               key={link.path}
               to={link.path}
-              onClick={() => setMenuOpen(false)}
+              onClick={function() { setMenuOpen(false); }}
               style={{
-                fontFamily: 'var(--font-display)',
-                fontSize: '3.5rem',
-                color: isActive ? 'var(--green-400)' : 'var(--text-secondary)',
-                letterSpacing: '0.08em',
-                textShadow: isActive ? '0 0 30px rgba(46,204,55,0.5)' : 'none',
-                transition: 'all 0.25s ease',
-                opacity: menuOpen ? 1 : 0,
-                transform: menuOpen ? 'translateY(0)' : 'translateY(20px)',
-                transitionDelay: menuOpen ? `${i * 0.07}s` : '0s',
-                lineHeight: 1.2,
+                fontFamily:    'var(--font-serif)',
+                fontSize:      'clamp(2.8rem, 8vw, 4.5rem)',
+                fontWeight:    300,
+                fontStyle:     'italic',
+                color:         isActive ? 'var(--copper-light)' : 'var(--pearl-dim)',
+                letterSpacing: '0.02em',
+                lineHeight:    1.2,
+                opacity:       menuOpen ? 1 : 0,
+                transform:     menuOpen ? 'translateY(0)' : 'translateY(16px)',
+                transition:    'opacity 0.4s ease ' + (i * 0.06) + 's, transform 0.4s ease ' + (i * 0.06) + 's, color 0.3s ease',
+              }}
+              onMouseEnter={function(e) {
+                if (!isActive) e.currentTarget.style.color = 'var(--pearl)';
+              }}
+              onMouseLeave={function(e) {
+                if (!isActive) e.currentTarget.style.color = 'var(--pearl-dim)';
               }}
             >
               {link.label}
@@ -286,22 +283,23 @@ export default function Navbar() {
 
         <Link
           to="/vidyut-26"
-          onClick={() => setMenuOpen(false)}
+          onClick={function() { setMenuOpen(false); }}
           style={{
-            marginTop: 32,
-            opacity: menuOpen ? 1 : 0,
-            transform: menuOpen ? 'translateY(0)' : 'translateY(20px)',
-            transition: 'all 0.3s ease',
-            transitionDelay: menuOpen ? '0.3s' : '0s',
+            marginTop:  44,
+            opacity:    menuOpen ? 1 : 0,
+            transform:  menuOpen ? 'translateY(0)' : 'translateY(16px)',
+            transition: 'opacity 0.4s ease 0.28s, transform 0.4s ease 0.28s',
           }}
         >
-          <button className="btn-glow">
-            <span>Register Now</span>
+          <button className="btn-primary">
+            <span>Register for Vidyut 26</span>
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+              <path d="M5 12h14M12 5l7 7-7 7"/>
+            </svg>
           </button>
         </Link>
       </div>
 
-      {/* ── Responsive styles injected ── */}
       <style>{`
         @media (max-width: 900px) {
           .desktop-nav { display: none !important; }

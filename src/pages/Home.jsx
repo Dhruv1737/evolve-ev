@@ -1,748 +1,893 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 
-// ── Animated counter ──
-function Counter({ target, suffix = '', duration = 2000 }) {
-  const [count, setCount] = useState(0);
-  const ref = useRef(null);
-  const started = useRef(false);
-
-  useEffect(() => {
-    const observer = new IntersectionObserver(([entry]) => {
-      if (entry.isIntersecting && !started.current) {
-        started.current = true;
-        const start = performance.now();
-        const tick = (now) => {
-          const progress = Math.min((now - start) / duration, 1);
-          const ease = 1 - Math.pow(1 - progress, 3);
-          setCount(Math.floor(ease * target));
-          if (progress < 1) requestAnimationFrame(tick);
-        };
-        requestAnimationFrame(tick);
+function useReveal(threshold) {
+  var t = threshold || 0.1;
+  var ref = useRef(null);
+  var s = useState(false);
+  var visible = s[0];
+  var setVisible = s[1];
+  useEffect(function() {
+    var observer = new IntersectionObserver(function(entries) {
+      if (entries[0].isIntersecting) {
+        setVisible(true);
+        observer.disconnect();
       }
-    }, { threshold: 0.5 });
+    }, { threshold: t });
     if (ref.current) observer.observe(ref.current);
-    return () => observer.disconnect();
-  }, [target, duration]);
-
-  return <span ref={ref}>{count}{suffix}</span>;
-}
-
-// ── Scroll reveal hook ──
-function useReveal() {
-  const ref = useRef(null);
-  const [visible, setVisible] = useState(false);
-  useEffect(() => {
-    const observer = new IntersectionObserver(([e]) => {
-      if (e.isIntersecting) { setVisible(true); observer.disconnect(); }
-    }, { threshold: 0.15 });
-    if (ref.current) observer.observe(ref.current);
-    return () => observer.disconnect();
+    return function() { observer.disconnect(); };
   }, []);
   return [ref, visible];
 }
 
-// ── Glitch text ──
-function GlitchText({ text, style }) {
-  return (
-    <div style={{ position: 'relative', display: 'inline-block', ...style }}>
-      <span style={{ position: 'relative', zIndex: 2 }}>{text}</span>
-      <span style={{
-        position: 'absolute', inset: 0, zIndex: 1,
-        color: 'var(--green-300)',
-        animation: 'glitch-1 4s infinite',
-        clipPath: 'inset(0 0 95% 0)',
-      }}>{text}</span>
-      <span style={{
-        position: 'absolute', inset: 0, zIndex: 1,
-        color: 'var(--accent)',
-        animation: 'glitch-2 4s infinite 0.5s',
-        clipPath: 'inset(80% 0 5% 0)',
-      }}>{text}</span>
-    </div>
-  );
+function Counter(props) {
+  var target   = props.target;
+  var suffix   = props.suffix || '';
+  var prefix   = props.prefix || '';
+  var duration = props.duration || 2200;
+  var s = useState(0);
+  var count    = s[0];
+  var setCount = s[1];
+  var ref      = useRef(null);
+  var started  = useRef(false);
+
+  useEffect(function() {
+    var observer = new IntersectionObserver(function(entries) {
+      if (entries[0].isIntersecting && !started.current) {
+        started.current = true;
+        var start = performance.now();
+        function tick(now) {
+          var progress = Math.min((now - start) / duration, 1);
+          var ease = 1 - Math.pow(1 - progress, 4);
+          setCount(Math.floor(ease * target));
+          if (progress < 1) requestAnimationFrame(tick);
+        }
+        requestAnimationFrame(tick);
+      }
+    }, { threshold: 0.5 });
+    if (ref.current) observer.observe(ref.current);
+    return function() { observer.disconnect(); };
+  }, [target, duration]);
+
+  return React.createElement('span', { ref: ref }, prefix + count + suffix);
 }
 
-const STATS = [
-  { value: 26,   suffix: 'th', label: 'Edition',        desc: 'Annual EV Conclave' },
-  { value: 5000, suffix: '+',  label: 'Attendees',       desc: 'Expected footfall' },
-  { value: 48,   suffix: 'h',  label: 'Of Innovation',   desc: 'Non-stop events' },
-  { value: 30,   suffix: '+',  label: 'Exhibitors',      desc: 'EV brands & startups' },
-];
-
-const HIGHLIGHTS = [
+var HIGHLIGHTS = [
   {
-    icon: '⚡',
-    title: 'Live EV Showcase',
-    desc: 'Experience the latest electric vehicles from top manufacturers up close. Test drives, tech demos, and live walkthroughs.',
-    tag: 'EXHIBITION',
+    tag:   'Exhibition',
+    title: 'EV Grand Showcase',
+    desc:  'Production vehicles, concept cars, and working prototypes from India\'s leading manufacturers.',
+    stat:  '30+ Brands',
   },
   {
-    icon: '🏁',
+    tag:   'Competition',
     title: 'Speed Trials',
-    desc: 'Watch electric vehicles compete in timed acceleration runs. Raw power, zero emissions, maximum thrill.',
-    tag: 'COMPETITION',
+    desc:  'Student-built electric vehicles race on a purpose-built track. Peak torque, zero emissions.',
+    stat:  '₹1.5L Prize',
   },
   {
-    icon: '🧠',
-    title: 'Tech Symposium',
-    desc: 'Industry leaders and researchers share breakthroughs in battery tech, charging infra, and EV policy.',
-    tag: 'KNOWLEDGE',
+    tag:   'Knowledge',
+    title: 'Battery Symposium',
+    desc:  'Solid-state cells, silicon anodes, ultra-fast charging — the science of tomorrow\'s batteries.',
+    stat:  '12 Speakers',
   },
   {
-    icon: '🔋',
-    title: 'Battery Innovation Lab',
-    desc: 'Hands-on with next-gen solid-state batteries, fast-charging prototypes, and energy storage solutions.',
-    tag: 'WORKSHOP',
-  },
-  {
-    icon: '🌍',
-    title: 'Green Future Summit',
-    desc: 'Panel discussions on sustainable mobility, carbon neutrality, and India\'s EV roadmap to 2030.',
-    tag: 'SUMMIT',
-  },
-  {
-    icon: '🏆',
+    tag:   'Challenge',
     title: 'EV Hackathon',
-    desc: '48-hour challenge to prototype innovative EV solutions. Prizes worth ₹5 Lakhs up for grabs.',
-    tag: 'CHALLENGE',
+    desc:  '48 hours to prototype EV solutions. Mentored by industry leaders. Judged by investors.',
+    stat:  '₹5L Prize',
+  },
+  {
+    tag:   'Summit',
+    title: 'Green Future',
+    desc:  'Policy, infrastructure, and India\'s path to 30% EV adoption by 2030.',
+    stat:  'Open Access',
+  },
+  {
+    tag:   'Workshop',
+    title: 'Charging Lab',
+    desc:  'Hands-on configuration of real EV charging stations. V2G, smart grid, and demand response.',
+    stat:  '60 Seats',
   },
 ];
 
 export default function Home() {
-  const [heroVisible, setHeroVisible] = useState(false);
-  const [statsRef, statsVisible] = useReveal();
-  const [highlightsRef, highlightsVisible] = useReveal();
-  const [ctaRef, ctaVisible] = useReveal();
-  const canvasRef = useRef(null);
+  var heroState      = useState(false);
+  var heroVisible    = heroState[0];
+  var setHeroVisible = heroState[1];
 
-  // Hero entrance
-  useEffect(() => {
-    const t = setTimeout(() => setHeroVisible(true), 100);
-    return () => clearTimeout(t);
-  }, []);
+  var r1 = useReveal(0.08);
+  var bentoRef     = r1[0];
+  var bentoVisible = r1[1];
 
-  // ── Electric arc canvas ──
-  useEffect(() => {
-    const canvas = canvasRef.current;
-    if (!canvas) return;
-    const ctx = canvas.getContext('2d');
-    let animId;
+  var r2 = useReveal();
+  var eventsRef     = r2[0];
+  var eventsVisible = r2[1];
 
-    const resize = () => {
-      canvas.width  = canvas.offsetWidth;
-      canvas.height = canvas.offsetHeight;
-    };
-    resize();
-    window.addEventListener('resize', resize);
+  var r3 = useReveal();
+  var ctaRef     = r3[0];
+  var ctaVisible = r3[1];
 
-    const arcs = [...Array(6)].map(() => ({
-      x: Math.random() * canvas.width,
-      y: Math.random() * canvas.height,
-      vx: (Math.random() - 0.5) * 0.4,
-      vy: (Math.random() - 0.5) * 0.4,
-      r: Math.random() * 120 + 60,
-      alpha: Math.random() * 0.12 + 0.04,
-    }));
-
-    const draw = () => {
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
-      arcs.forEach(a => {
-        a.x += a.vx; a.y += a.vy;
-        if (a.x < 0 || a.x > canvas.width)  a.vx *= -1;
-        if (a.y < 0 || a.y > canvas.height) a.vy *= -1;
-        const g = ctx.createRadialGradient(a.x, a.y, 0, a.x, a.y, a.r);
-        g.addColorStop(0, `rgba(46,204,55,${a.alpha})`);
-        g.addColorStop(1, 'rgba(46,204,55,0)');
-        ctx.beginPath();
-        ctx.arc(a.x, a.y, a.r, 0, Math.PI * 2);
-        ctx.fillStyle = g;
-        ctx.fill();
-      });
-      animId = requestAnimationFrame(draw);
-    };
-    draw();
-    return () => {
-      window.removeEventListener('resize', resize);
-      cancelAnimationFrame(animId);
-    };
+  useEffect(function() {
+    var t = setTimeout(function() { setHeroVisible(true); }, 120);
+    return function() { clearTimeout(t); };
   }, []);
 
   return (
     <div style={{ overflowX: 'hidden' }}>
 
-      {/* ════════════════════════════════
-          HERO SECTION
-      ════════════════════════════════ */}
+      {/* ══════════════════════════════════
+          HERO — Asymmetric Bleed
+      ══════════════════════════════════ */}
       <section style={{
-        minHeight: '100vh',
-        display: 'flex',
-        alignItems: 'center',
-        position: 'relative',
-        overflow: 'hidden',
-        paddingTop: 100,
+        minHeight:      '100vh',
+        display:        'flex',
+        alignItems:     'center',
+        position:       'relative',
+        overflow:       'hidden',
+        paddingTop:     100,
+        paddingBottom:  60,
       }}>
-        {/* Canvas background */}
-        <canvas ref={canvasRef} style={{
-          position: 'absolute', inset: 0,
-          width: '100%', height: '100%',
-          pointerEvents: 'none',
-        }} />
 
-        {/* Diagonal accent line */}
+        {/* Full bleed background image — right side bleeds off screen */}
         <div style={{
-          position: 'absolute',
-          top: 0, right: '25%',
-          width: 1, height: '100%',
-          background: 'linear-gradient(180deg, transparent, rgba(46,204,55,0.15), transparent)',
-          transform: 'skewX(-15deg)',
+          position:           'absolute',
+          top: 0, right: -40, bottom: 0,
+          width:              '58%',
+          backgroundImage:    'url(https://images.unsplash.com/photo-1617788138017-80ad40651399?w=1400&q=90)',
+          backgroundSize:     'cover',
+          backgroundPosition: 'center left',
+          filter:             'brightness(0.45) contrast(1.15) saturate(0.4)',
         }} />
+
+        {/* Left fade mask */}
         <div style={{
-          position: 'absolute',
-          top: 0, right: '45%',
-          width: 1, height: '100%',
-          background: 'linear-gradient(180deg, transparent, rgba(46,204,55,0.07), transparent)',
-          transform: 'skewX(-15deg)',
+          position:   'absolute',
+          top: 0, left: 0, bottom: 0,
+          width:      '55%',
+          background: 'linear-gradient(90deg, var(--charcoal) 55%, transparent 100%)',
+          zIndex:     1,
         }} />
 
-        <div className="container" style={{ position: 'relative', zIndex: 2 }}>
-          <div style={{
-            display: 'grid',
-            gridTemplateColumns: '1fr 1fr',
-            alignItems: 'center',
-            gap: 80,
-            minHeight: '80vh',
-          }}
-            className="hero-grid"
-          >
+        {/* Bottom fade */}
+        <div style={{
+          position:   'absolute',
+          bottom: 0, left: 0, right: 0,
+          height:     '30%',
+          background: 'linear-gradient(0deg, var(--charcoal) 0%, transparent 100%)',
+          zIndex:     1,
+        }} />
 
-            {/* ── Left: Text ── */}
-            <div>
-              {/* Badge */}
-              <div style={{
-                opacity: heroVisible ? 1 : 0,
-                transform: heroVisible ? 'translateY(0)' : 'translateY(20px)',
-                transition: 'all 0.6s ease 0.1s',
-              }}>
-                <span className="badge" style={{ marginBottom: 28, display: 'inline-flex' }}>
-                  EV Day 2026 — Vidyut 26
-                </span>
-              </div>
+        {/* Subtle copper vertical line */}
+        <div style={{
+          position:   'absolute',
+          top: '15%', bottom: '15%',
+          left:       '42%',
+          width:      1,
+          background: 'linear-gradient(180deg, transparent, rgba(184,115,51,0.3), transparent)',
+          zIndex:     2,
+        }} />
 
-              {/* Main headline */}
-              <div style={{
-                opacity: heroVisible ? 1 : 0,
-                transform: heroVisible ? 'translateY(0)' : 'translateY(30px)',
-                transition: 'all 0.7s ease 0.2s',
-              }}>
-                <h1 style={{
-                  fontFamily: 'var(--font-display)',
-                  fontSize: 'clamp(4rem, 8vw, 7.5rem)',
-                  lineHeight: 0.95,
-                  letterSpacing: '0.03em',
-                  marginBottom: 8,
-                }}>
-                  <GlitchText
-                    text="THE"
-                    style={{ color: 'var(--text-secondary)', display: 'block' }}
-                  />
-                  <span style={{
-                    display: 'block',
-                    color: 'var(--green-400)',
-                    textShadow: '0 0 40px rgba(46,204,55,0.4), 0 0 80px rgba(46,204,55,0.15)',
-                  }}>
-                    ELECTRIC
-                  </span>
-                  <span style={{
-                    display: 'block',
-                    color: 'var(--text-primary)',
-                    WebkitTextStroke: '1px rgba(46,204,55,0.3)',
-                  }}>
-                    FUTURE
-                  </span>
-                  <span style={{
-                    display: 'block',
-                    color: 'var(--text-secondary)',
-                    fontSize: '60%',
-                    letterSpacing: '0.15em',
-                  }}>
-                    IS NOW
-                  </span>
-                </h1>
-              </div>
+        <div className="container" style={{ position: 'relative', zIndex: 3 }}>
+          <div style={{ maxWidth: 620 }}>
 
-              {/* Subtext */}
-              <div style={{
-                opacity: heroVisible ? 1 : 0,
-                transform: heroVisible ? 'translateY(0)' : 'translateY(20px)',
-                transition: 'all 0.7s ease 0.35s',
-              }}>
-                <p style={{
-                  fontFamily: 'var(--font-body)',
-                  fontSize: '1.05rem',
-                  color: 'var(--text-secondary)',
-                  lineHeight: 1.75,
-                  maxWidth: 460,
-                  margin: '28px 0 40px',
-                }}>
-                  India's premier electric vehicle conclave returns.
-                  Three days of innovation, competition, and the future
-                  of sustainable mobility — all at NIT Bhopal.
-                </p>
-              </div>
-
-              {/* CTA Buttons */}
-              <div style={{
-                display: 'flex', gap: 16, flexWrap: 'wrap',
-                opacity: heroVisible ? 1 : 0,
-                transform: heroVisible ? 'translateY(0)' : 'translateY(20px)',
-                transition: 'all 0.7s ease 0.45s',
-              }}>
-                <Link to="/vidyut-26">
-                  <button className="btn-glow">
-                    <span>Explore Vidyut 26</span>
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none"
-                      stroke="currentColor" strokeWidth="2.5">
-                      <path d="M5 12h14M12 5l7 7-7 7"/>
-                    </svg>
-                  </button>
-                </Link>
-                <Link to="/about">
-                  <button className="btn-outline">
-                    <span>About EVOLVE</span>
-                  </button>
-                </Link>
-              </div>
-
-              {/* Date strip */}
-              <div style={{
-                display: 'flex', alignItems: 'center', gap: 24,
-                marginTop: 56,
-                opacity: heroVisible ? 1 : 0,
-                transition: 'all 0.7s ease 0.55s',
-              }}>
-                {[
-                  { label: 'DATE', value: 'Mar 14–16, 2026' },
-                  { label: 'VENUE', value: 'NIT Bhopal' },
-                  { label: 'EDITION', value: '26th Annual' },
-                ].map((item, i) => (
-                  <React.Fragment key={item.label}>
-                    {i > 0 && (
-                      <div style={{ width: 1, height: 32, background: 'rgba(46,204,55,0.2)' }} />
-                    )}
-                    <div>
-                      <div style={{
-                        fontFamily: 'var(--font-mono)',
-                        fontSize: '0.55rem',
-                        color: 'var(--text-muted)',
-                        letterSpacing: '0.25em',
-                        marginBottom: 4,
-                      }}>{item.label}</div>
-                      <div style={{
-                        fontFamily: 'var(--font-heading)',
-                        fontSize: '0.78rem',
-                        color: 'var(--green-300)',
-                        letterSpacing: '0.06em',
-                      }}>{item.value}</div>
-                    </div>
-                  </React.Fragment>
-                ))}
+            {/* Eyebrow */}
+            <div style={{
+              opacity:    heroVisible ? 1 : 0,
+              transform:  heroVisible ? 'translateY(0)' : 'translateY(16px)',
+              transition: 'all 0.6s ease 0.1s',
+            }}>
+              <div className="eyebrow" style={{ marginBottom: 32 }}>
+                NIT Bhopal &nbsp;·&nbsp; March 14–16, 2026
               </div>
             </div>
 
-            {/* ── Right: Visual ── */}
+            {/* Main headline — editorial serif */}
             <div style={{
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              position: 'relative',
-              opacity: heroVisible ? 1 : 0,
-              transform: heroVisible ? 'scale(1)' : 'scale(0.9)',
-              transition: 'all 0.9s ease 0.3s',
+              opacity:    heroVisible ? 1 : 0,
+              transform:  heroVisible ? 'translateY(0)' : 'translateY(24px)',
+              transition: 'all 0.8s ease 0.2s',
             }}>
-              {/* Outer spinning ring */}
-              <div style={{
-                position: 'absolute',
-                width: 420, height: 420,
-                border: '1px solid rgba(46,204,55,0.1)',
-                borderRadius: '50%',
-                animation: 'spin-slow 20s linear infinite',
+              <h1 style={{
+                fontFamily:    'var(--font-serif)',
+                fontSize:      'clamp(3.8rem, 7.5vw, 7rem)',
+                fontWeight:    300,
+                lineHeight:    1.0,
+                letterSpacing: '-0.01em',
+                color:         'var(--pearl)',
+                marginBottom:  0,
               }}>
-                {[0, 90, 180, 270].map(deg => (
-                  <div key={deg} style={{
-                    position: 'absolute',
-                    width: 8, height: 8,
-                    background: 'var(--green-500)',
-                    borderRadius: '50%',
-                    top: '50%', left: '50%',
-                    transform: `rotate(${deg}deg) translateX(210px) translate(-50%,-50%)`,
-                    boxShadow: '0 0 10px var(--green-500)',
-                  }} />
-                ))}
-              </div>
+                <span style={{ display: 'block' }}>The</span>
+                <span style={{
+                  display:     'block',
+                  fontStyle:   'italic',
+                  color:       'var(--copper-light)',
+                }}>
+                  Electric
+                </span>
+                <span style={{ display: 'block' }}>Future</span>
+                <span style={{
+                  display:       'block',
+                  fontFamily:    'var(--font-wide)',
+                  fontSize:      '38%',
+                  fontStyle:     'normal',
+                  fontWeight:    800,
+                  letterSpacing: '0.28em',
+                  color:         'var(--pearl-muted)',
+                  marginTop:     12,
+                }}>
+                  IS NOW
+                </span>
+              </h1>
+            </div>
 
-              {/* Middle ring */}
-              <div style={{
-                position: 'absolute',
-                width: 300, height: 300,
-                border: '1px dashed rgba(46,204,55,0.15)',
-                borderRadius: '50%',
-                animation: 'spin-reverse 14s linear infinite',
-              }} />
-
-              {/* Inner ring */}
-              <div style={{
-                position: 'absolute',
-                width: 200, height: 200,
-                border: '1px solid rgba(46,204,55,0.2)',
-                borderRadius: '50%',
-                animation: 'spin-slow 8s linear infinite',
-              }} />
-
-              {/* Center logo */}
-              <div style={{
-                position: 'relative',
-                zIndex: 2,
-                display: 'flex',
-                flexDirection: 'column',
-                alignItems: 'center',
-                gap: 16,
-                animation: 'float 6s ease-in-out infinite',
+            {/* Description */}
+            <div style={{
+              opacity:    heroVisible ? 1 : 0,
+              transform:  heroVisible ? 'translateY(0)' : 'translateY(16px)',
+              transition: 'all 0.8s ease 0.38s',
+            }}>
+              <p style={{
+                fontFamily:  'var(--font-body)',
+                fontSize:    '1rem',
+                fontWeight:  300,
+                color:       'var(--pearl-muted)',
+                lineHeight:  1.8,
+                maxWidth:    460,
+                margin:      '32px 0 44px',
               }}>
-                <div style={{
-                  width: 140, height: 140,
-                  borderRadius: '50%',
-                  background: 'radial-gradient(circle, rgba(46,204,55,0.12) 0%, rgba(5,10,5,0.8) 70%)',
-                  border: '1px solid rgba(46,204,55,0.25)',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  boxShadow: '0 0 40px rgba(46,204,55,0.2), inset 0 0 40px rgba(46,204,55,0.05)',
-                  animation: 'pulse-glow 3s ease infinite',
-                }}>
-                  <img
-                    src="https://evolve.nitb.in/Evolve_Logo.png"
-                    alt="EVOLVE"
-                    style={{ width: 90, filter: 'drop-shadow(0 0 16px rgba(46,204,55,0.6))' }}
-                  />
-                </div>
+                India's most anticipated student-led electric vehicle conclave.
+                Three days of engineering, competition, and the conversations
+                that will shape how a billion people move.
+              </p>
+            </div>
 
-                {/* Voltage label */}
-                <div style={{
-                  fontFamily: 'var(--font-display)',
-                  fontSize: '2.5rem',
-                  color: 'var(--green-400)',
-                  letterSpacing: '0.1em',
-                  textShadow: '0 0 20px rgba(46,204,55,0.5)',
-                  animation: 'flicker 8s ease infinite',
-                }}>
-                  VIDYUT 26
-                </div>
-              </div>
+            {/* CTA row */}
+            <div style={{
+              display:    'flex',
+              gap:        16,
+              flexWrap:   'wrap',
+              opacity:    heroVisible ? 1 : 0,
+              transform:  heroVisible ? 'translateY(0)' : 'translateY(16px)',
+              transition: 'all 0.8s ease 0.5s',
+            }}>
+              <Link to="/vidyut-26">
+                <button className="btn-primary">
+                  <span>Explore Vidyut 26</span>
+                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+                    <path d="M5 12h14M12 5l7 7-7 7"/>
+                  </svg>
+                </button>
+              </Link>
+              <Link to="/about">
+                <button className="btn-ghost">
+                  <span>About EVOLVE</span>
+                </button>
+              </Link>
+            </div>
 
-              {/* Floating data chips */}
+            {/* Meta strip */}
+            <div style={{
+              display:    'flex',
+              gap:        0,
+              marginTop:  64,
+              opacity:    heroVisible ? 1 : 0,
+              transition: 'all 0.8s ease 0.62s',
+            }}>
               {[
-                { label: 'ZERO EMISSION', top: '8%',  left: '5%'  },
-                { label: '100% ELECTRIC', top: '8%',  right: '5%' },
-                { label: 'NET ZERO 2030', bottom: '8%', left: '5%' },
-                { label: 'EV REVOLUTION', bottom: '8%', right: '5%'},
-              ].map((chip, i) => (
-                <div key={i} style={{
-                  position: 'absolute',
-                  ...chip,
-                  fontFamily: 'var(--font-mono)',
-                  fontSize: '0.55rem',
-                  color: 'var(--green-500)',
-                  letterSpacing: '0.15em',
-                  padding: '5px 10px',
-                  border: '1px solid rgba(46,204,55,0.2)',
-                  background: 'rgba(5,10,5,0.7)',
-                  backdropFilter: 'blur(8px)',
-                  animation: `float ${5 + i}s ease-in-out infinite`,
-                  animationDelay: `${i * 0.8}s`,
-                }}>
-                  {chip.label}
-                </div>
-              ))}
+                { label: 'Edition',  value: '26th Annual' },
+                { label: 'Venue',    value: 'NIT Bhopal'  },
+                { label: 'Entry',    value: 'Free — Open' },
+              ].map(function(item, i) {
+                return (
+                  <div key={item.label} style={{
+                    paddingRight: 32,
+                    marginRight:  32,
+                    borderRight:  i < 2 ? '1px solid rgba(255,255,255,0.06)' : 'none',
+                  }}>
+                    <div style={{
+                      fontFamily:    'var(--font-wide)',
+                      fontSize:      '0.52rem',
+                      fontWeight:    600,
+                      letterSpacing: '0.25em',
+                      textTransform: 'uppercase',
+                      color:         'var(--pearl-ghost)',
+                      marginBottom:  5,
+                    }}>
+                      {item.label}
+                    </div>
+                    <div style={{
+                      fontFamily:    'var(--font-body)',
+                      fontSize:      '0.85rem',
+                      fontWeight:    400,
+                      color:         'var(--pearl-dim)',
+                    }}>
+                      {item.value}
+                    </div>
+                  </div>
+                );
+              })}
             </div>
           </div>
         </div>
 
         {/* Scroll indicator */}
         <div style={{
-          position: 'absolute',
-          bottom: 40, left: '50%',
-          transform: 'translateX(-50%)',
-          display: 'flex', flexDirection: 'column',
-          alignItems: 'center', gap: 8,
-          opacity: heroVisible ? 0.6 : 0,
-          transition: 'opacity 1s ease 1s',
+          position:   'absolute',
+          bottom:     40,
+          left:       56,
+          zIndex:     4,
+          display:    'flex',
+          alignItems: 'center',
+          gap:        14,
+          opacity:    heroVisible ? 0.5 : 0,
+          transition: 'opacity 1s ease 1.2s',
         }}>
           <div style={{
-            fontFamily: 'var(--font-mono)',
-            fontSize: '0.55rem',
-            color: 'var(--text-muted)',
-            letterSpacing: '0.3em',
-          }}>SCROLL</div>
-          <div style={{
-            width: 1, height: 50,
-            background: 'linear-gradient(180deg, rgba(46,204,55,0.6), transparent)',
-            animation: 'float 2s ease-in-out infinite',
+            width:      40,
+            height:     1,
+            background: 'var(--copper)',
+            animation:  'lineGrow 1s ease 1.5s both',
+            transformOrigin: 'left',
           }} />
-        </div>
-      </section>
-
-      {/* ════════════════════════════════
-          STATS SECTION
-      ════════════════════════════════ */}
-      <section className="section-sm" ref={statsRef} style={{ position: 'relative' }}>
-        <div style={{
-          position: 'absolute', inset: 0,
-          background: 'linear-gradient(180deg, transparent, rgba(20,83,26,0.06), transparent)',
-          pointerEvents: 'none',
-        }} />
-        <div className="container">
           <div style={{
-            display: 'grid',
-            gridTemplateColumns: 'repeat(4, 1fr)',
-            gap: 2,
-          }}
-            className="stats-grid"
-          >
-            {STATS.map((stat, i) => (
-              <div key={stat.label}
-                className="card"
-                style={{
-                  padding: '48px 32px',
-                  textAlign: 'center',
-                  opacity: statsVisible ? 1 : 0,
-                  transform: statsVisible ? 'translateY(0)' : 'translateY(30px)',
-                  transition: `all 0.6s ease ${i * 0.1}s`,
-                  borderRadius: i === 0 ? '8px 0 0 8px' : i === 3 ? '0 8px 8px 0' : 0,
-                }}
-              >
-                <div style={{
-                  fontFamily: 'var(--font-display)',
-                  fontSize: 'clamp(2.5rem, 4vw, 4rem)',
-                  color: 'var(--green-400)',
-                  lineHeight: 1,
-                  textShadow: '0 0 30px rgba(46,204,55,0.3)',
-                  marginBottom: 4,
-                }}>
-                  <Counter target={stat.value} suffix={stat.suffix} />
-                </div>
-                <div style={{
-                  fontFamily: 'var(--font-heading)',
-                  fontSize: '0.72rem',
-                  color: 'var(--text-primary)',
-                  letterSpacing: '0.12em',
-                  marginBottom: 6,
-                }}>
-                  {stat.label}
-                </div>
-                <div style={{
-                  fontFamily: 'var(--font-mono)',
-                  fontSize: '0.58rem',
-                  color: 'var(--text-muted)',
-                  letterSpacing: '0.1em',
-                }}>
-                  {stat.desc}
-                </div>
-              </div>
-            ))}
+            fontFamily:    'var(--font-wide)',
+            fontSize:      '0.52rem',
+            fontWeight:    600,
+            letterSpacing: '0.3em',
+            color:         'var(--pearl-ghost)',
+            textTransform: 'uppercase',
+          }}>
+            Scroll
           </div>
         </div>
       </section>
 
-      {/* ════════════════════════════════
-          HIGHLIGHTS SECTION
-      ════════════════════════════════ */}
-      <section className="section" ref={highlightsRef}>
+
+      {/* ══════════════════════════════════
+          BENTO GRID — Stats + Highlight
+      ══════════════════════════════════ */}
+      <section className="section-sm" ref={bentoRef}>
         <div className="container">
-          <div style={{ textAlign: 'center', marginBottom: 72 }}>
-            <div className="section-label" style={{ justifyContent: 'center' }}>
-              What Awaits You
-            </div>
-            <h2 style={{
-              fontFamily: 'var(--font-display)',
-              fontSize: 'clamp(2.5rem, 5vw, 4.5rem)',
-              color: 'var(--text-primary)',
-              letterSpacing: '0.04em',
-            }}>
-              EVENT{' '}
-              <span style={{
-                color: 'var(--green-400)',
-                textShadow: '0 0 30px rgba(46,204,55,0.3)',
+
+          <div style={{
+            display:             'grid',
+            gridTemplateColumns: '2fr 1fr 1fr',
+            gridTemplateRows:    'auto auto',
+            gap:                 16,
+          }}
+            className="bento-master"
+          >
+
+            {/* Tile A — Large: Image + statement */}
+            <div style={{
+              gridRow:      'span 2',
+              position:     'relative',
+              overflow:     'hidden',
+              minHeight:    480,
+              background:   'var(--charcoal-2)',
+              border:       'var(--border)',
+              opacity:      bentoVisible ? 1 : 0,
+              transform:    bentoVisible ? 'translateY(0)' : 'translateY(32px)',
+              transition:   'all 0.7s ease 0s',
+            }}
+              className="bento-tile"
+            >
+              <img
+                src="https://images.unsplash.com/photo-1593941707882-a5bba14938c7?w=900&q=85"
+                alt="Electric Vehicle"
+                style={{
+                  width:      '100%',
+                  height:     '100%',
+                  objectFit:  'cover',
+                  position:   'absolute',
+                  inset:      0,
+                  filter:     'brightness(0.4) contrast(1.2) saturate(0.35)',
+                  transition: 'transform 0.8s ease, filter 0.6s ease',
+                }}
+                onMouseEnter={function(e) {
+                  e.currentTarget.style.transform = 'scale(1.04)';
+                  e.currentTarget.style.filter    = 'brightness(0.5) contrast(1.15) saturate(0.45)';
+                }}
+                onMouseLeave={function(e) {
+                  e.currentTarget.style.transform = 'scale(1)';
+                  e.currentTarget.style.filter    = 'brightness(0.4) contrast(1.2) saturate(0.35)';
+                }}
+              />
+
+              {/* Gradient overlay */}
+              <div style={{
+                position:   'absolute',
+                inset:      0,
+                background: 'linear-gradient(135deg, rgba(10,10,11,0.85) 0%, rgba(10,10,11,0.3) 60%, transparent 100%)',
+              }} />
+
+              {/* Content */}
+              <div style={{
+                position: 'absolute',
+                inset:    0,
+                padding:  '44px 40px',
+                display:  'flex',
+                flexDirection: 'column',
+                justifyContent: 'space-between',
               }}>
-                HIGHLIGHTS
-              </span>
-            </h2>
-          </div>
-
-          <div style={{
-            display: 'grid',
-            gridTemplateColumns: 'repeat(3, 1fr)',
-            gap: 20,
-          }}
-            className="highlights-grid"
-          >
-            {HIGHLIGHTS.map((item, i) => (
-              <div
-                key={item.title}
-                className="card"
-                style={{
-                  padding: '36px 32px',
-                  borderRadius: 8,
-                  cursor: 'default',
-                  opacity: highlightsVisible ? 1 : 0,
-                  transform: highlightsVisible ? 'translateY(0)' : 'translateY(40px)',
-                  transition: `all 0.6s ease ${i * 0.08}s`,
-                }}
-                onMouseEnter={e => {
-                  e.currentTarget.style.transform = 'translateY(-6px)';
-                  e.currentTarget.style.borderColor = 'rgba(46,204,55,0.3)';
-                  e.currentTarget.style.boxShadow = '0 20px 40px rgba(0,0,0,0.4), 0 0 30px rgba(46,204,55,0.1)';
-                }}
-                onMouseLeave={e => {
-                  e.currentTarget.style.transform = 'translateY(0)';
-                  e.currentTarget.style.borderColor = 'rgba(46,204,55,0.12)';
-                  e.currentTarget.style.boxShadow = 'none';
-                }}
-              >
-                {/* Tag */}
-                <div style={{
-                  fontFamily: 'var(--font-mono)',
-                  fontSize: '0.58rem',
-                  color: 'var(--green-600)',
-                  letterSpacing: '0.25em',
-                  marginBottom: 16,
-                }}>
-                  {item.tag}
+                <div className="badge" style={{ alignSelf: 'flex-start' }}>
+                  Live Showcase — Mar 14
                 </div>
 
-                {/* Icon */}
-                <div style={{
-                  fontSize: '2.2rem',
-                  marginBottom: 16,
-                  filter: 'drop-shadow(0 0 8px rgba(46,204,55,0.3))',
-                }}>
-                  {item.icon}
+                <div>
+                  <div style={{
+                    fontFamily:    'var(--font-serif)',
+                    fontSize:      'clamp(1.8rem, 3vw, 2.8rem)',
+                    fontWeight:    300,
+                    fontStyle:     'italic',
+                    color:         'var(--pearl)',
+                    lineHeight:    1.15,
+                    marginBottom:  16,
+                  }}>
+                    India's largest student EV showcase returns
+                  </div>
+                  <div style={{
+                    fontFamily:    'var(--font-wide)',
+                    fontSize:      '0.6rem',
+                    fontWeight:    600,
+                    letterSpacing: '0.2em',
+                    color:         'var(--copper)',
+                    textTransform: 'uppercase',
+                  }}>
+                    30+ Exhibitors · 3 Days · NIT Bhopal
+                  </div>
                 </div>
-
-                {/* Title */}
-                <h3 style={{
-                  fontFamily: 'var(--font-heading)',
-                  fontSize: '0.95rem',
-                  color: 'var(--text-primary)',
-                  letterSpacing: '0.06em',
-                  marginBottom: 12,
-                  lineHeight: 1.3,
-                }}>
-                  {item.title}
-                </h3>
-
-                {/* Desc */}
-                <p style={{
-                  fontFamily: 'var(--font-body)',
-                  fontSize: '0.875rem',
-                  color: 'var(--text-muted)',
-                  lineHeight: 1.7,
-                }}>
-                  {item.desc}
-                </p>
-
-                {/* Bottom accent */}
-                <div style={{
-                  marginTop: 24,
-                  height: 2,
-                  background: 'linear-gradient(90deg, var(--green-700), transparent)',
-                  borderRadius: 1,
-                }} />
               </div>
-            ))}
+            </div>
+
+            {/* Tile B — CO2 counter */}
+            <div style={{
+              background:  'var(--charcoal-2)',
+              border:      'var(--border)',
+              padding:     '36px 32px',
+              display:     'flex',
+              flexDirection: 'column',
+              justifyContent: 'space-between',
+              opacity:     bentoVisible ? 1 : 0,
+              transform:   bentoVisible ? 'translateY(0)' : 'translateY(32px)',
+              transition:  'all 0.7s ease 0.1s',
+              position:    'relative',
+              overflow:    'hidden',
+            }}
+              className="bento-tile"
+            >
+              <div style={{
+                fontFamily:    'var(--font-wide)',
+                fontSize:      '0.55rem',
+                fontWeight:    600,
+                letterSpacing: '0.25em',
+                color:         'var(--pearl-ghost)',
+                textTransform: 'uppercase',
+              }}>
+                CO₂ Avoided
+              </div>
+              <div>
+                <div style={{
+                  fontFamily:  'var(--font-serif)',
+                  fontSize:    'clamp(2.5rem, 4vw, 3.8rem)',
+                  fontWeight:  300,
+                  color:       'var(--copper-light)',
+                  lineHeight:  1,
+                  marginBottom: 8,
+                }}>
+                  <Counter target={1200} prefix="" suffix="K" />
+                  <span style={{ fontSize: '40%', fontFamily: 'var(--font-wide)', fontWeight: 600, letterSpacing: '0.1em', marginLeft: 6, color: 'var(--pearl-muted)', verticalAlign: 'middle' }}>TONS</span>
+                </div>
+                <div style={{
+                  fontFamily:    'var(--font-body)',
+                  fontSize:      '0.78rem',
+                  fontWeight:    300,
+                  color:         'var(--pearl-muted)',
+                  lineHeight:    1.6,
+                }}>
+                  Projected annual impact of Vidyut alumni startups
+                </div>
+              </div>
+
+              {/* Copper corner accent */}
+              <div style={{
+                position: 'absolute',
+                bottom: 0, right: 0,
+                width: 60, height: 60,
+                borderTop:  '1px solid rgba(184,115,51,0.15)',
+                borderLeft: '1px solid rgba(184,115,51,0.15)',
+              }} />
+            </div>
+
+            {/* Tile C — Attendees */}
+            <div style={{
+              background:     'var(--copper)',
+              padding:        '36px 32px',
+              display:        'flex',
+              flexDirection:  'column',
+              justifyContent: 'space-between',
+              opacity:        bentoVisible ? 1 : 0,
+              transform:      bentoVisible ? 'translateY(0)' : 'translateY(32px)',
+              transition:     'all 0.7s ease 0.18s',
+              position:       'relative',
+              overflow:       'hidden',
+            }}
+              className="bento-tile"
+            >
+              <div style={{
+                fontFamily:    'var(--font-wide)',
+                fontSize:      '0.55rem',
+                fontWeight:    600,
+                letterSpacing: '0.25em',
+                color:         'rgba(10,10,11,0.6)',
+                textTransform: 'uppercase',
+              }}>
+                Expected Footfall
+              </div>
+              <div>
+                <div style={{
+                  fontFamily:   'var(--font-serif)',
+                  fontSize:     'clamp(2.5rem, 4vw, 3.8rem)',
+                  fontWeight:   300,
+                  color:        'var(--black)',
+                  lineHeight:   1,
+                  marginBottom: 8,
+                }}>
+                  <Counter target={5000} suffix="+" />
+                </div>
+                <div style={{
+                  fontFamily: 'var(--font-body)',
+                  fontSize:   '0.78rem',
+                  fontWeight: 400,
+                  color:      'rgba(10,10,11,0.65)',
+                  lineHeight: 1.6,
+                }}>
+                  Attendees across 3 days of Vidyut 26
+                </div>
+              </div>
+            </div>
+
+            {/* Tile D — Hackathon prize */}
+            <div style={{
+              background:     'var(--charcoal-3)',
+              border:         'var(--border)',
+              padding:        '36px 32px',
+              display:        'flex',
+              flexDirection:  'column',
+              justifyContent: 'space-between',
+              opacity:        bentoVisible ? 1 : 0,
+              transform:      bentoVisible ? 'translateY(0)' : 'translateY(32px)',
+              transition:     'all 0.7s ease 0.26s',
+            }}
+              className="bento-tile"
+            >
+              <div style={{
+                fontFamily:    'var(--font-wide)',
+                fontSize:      '0.55rem',
+                fontWeight:    600,
+                letterSpacing: '0.25em',
+                color:         'var(--pearl-ghost)',
+                textTransform: 'uppercase',
+              }}>
+                Total Prize Pool
+              </div>
+              <div>
+                <div style={{
+                  fontFamily:   'var(--font-serif)',
+                  fontSize:     'clamp(2.2rem, 3.5vw, 3.2rem)',
+                  fontWeight:   300,
+                  color:        'var(--pearl)',
+                  lineHeight:   1,
+                  marginBottom: 8,
+                }}>
+                  ₹6.5L
+                </div>
+                <div style={{
+                  fontFamily: 'var(--font-body)',
+                  fontSize:   '0.78rem',
+                  fontWeight: 300,
+                  color:      'var(--pearl-muted)',
+                  lineHeight: 1.6,
+                }}>
+                  Across Speed Trials, Hackathon and Design challenges
+                </div>
+              </div>
+            </div>
+
+            {/* Tile E — CTA */}
+            <div style={{
+              background:  'var(--charcoal-2)',
+              border:      'var(--border-copper)',
+              padding:     '36px 32px',
+              display:     'flex',
+              flexDirection: 'column',
+              justifyContent: 'space-between',
+              opacity:     bentoVisible ? 1 : 0,
+              transform:   bentoVisible ? 'translateY(0)' : 'translateY(32px)',
+              transition:  'all 0.7s ease 0.34s',
+              position:    'relative',
+              overflow:    'hidden',
+            }}
+              className="bento-tile"
+            >
+              <div style={{
+                fontFamily:    'var(--font-serif)',
+                fontSize:      '1.3rem',
+                fontWeight:    300,
+                fontStyle:     'italic',
+                color:         'var(--pearl)',
+                lineHeight:    1.3,
+                marginBottom:  20,
+              }}>
+                Register now — entry is completely free
+              </div>
+              <Link to="/vidyut-26">
+                <button className="btn-primary" style={{ width: '100%', justifyContent: 'center' }}>
+                  <span>Join the Movement</span>
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+                    <path d="M5 12h14M12 5l7 7-7 7"/>
+                  </svg>
+                </button>
+              </Link>
+
+              {/* Shimmer */}
+              <div style={{
+                position:   'absolute',
+                inset:      0,
+                background: 'linear-gradient(105deg, transparent 40%, rgba(184,115,51,0.04) 50%, transparent 60%)',
+                backgroundSize: '200% auto',
+                animation:  'shimmer 5s linear infinite',
+                pointerEvents: 'none',
+              }} />
+            </div>
           </div>
         </div>
       </section>
 
-      {/* ════════════════════════════════
+
+      {/* ══════════════════════════════════
+          EVENTS GRID
+      ══════════════════════════════════ */}
+      <section className="section" ref={eventsRef}>
+        <div className="container">
+
+          <div style={{
+            display:        'flex',
+            alignItems:     'flex-end',
+            justifyContent: 'space-between',
+            marginBottom:   64,
+            flexWrap:       'wrap',
+            gap:            24,
+          }}>
+            <div>
+              <div className="eyebrow">What Awaits You</div>
+              <h2 style={{
+                fontFamily:    'var(--font-serif)',
+                fontSize:      'clamp(2.4rem, 5vw, 4.2rem)',
+                fontWeight:    300,
+                color:         'var(--pearl)',
+                lineHeight:    1.05,
+              }}>
+                Six Days of<br />
+                <span style={{ fontStyle: 'italic', color: 'var(--copper-light)' }}>
+                  Electric Possibility
+                </span>
+              </h2>
+            </div>
+            <Link to="/vidyut-26">
+              <button className="btn-ghost">
+                <span>View All Events</span>
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <path d="M5 12h14M12 5l7 7-7 7"/>
+                </svg>
+              </button>
+            </Link>
+          </div>
+
+          <div style={{
+            display:             'grid',
+            gridTemplateColumns: 'repeat(3, 1fr)',
+            gap:                 2,
+          }}
+            className="events-grid"
+          >
+            {HIGHLIGHTS.map(function(item, i) {
+              return (
+                <div
+                  key={item.title}
+                  style={{
+                    padding:    '40px 36px',
+                    background: i % 2 === 0 ? 'var(--charcoal-2)' : 'var(--charcoal-3)',
+                    border:     'var(--border)',
+                    borderRadius: 0,
+                    position:   'relative',
+                    overflow:   'hidden',
+                    cursor:     'default',
+                    opacity:    eventsVisible ? 1 : 0,
+                    transform:  eventsVisible ? 'translateY(0)' : 'translateY(28px)',
+                    transition: 'all 0.6s ease ' + (i * 0.07) + 's',
+                  }}
+                  onMouseEnter={function(e) {
+                    e.currentTarget.style.borderColor   = 'rgba(184,115,51,0.25)';
+                    e.currentTarget.style.background    = 'var(--charcoal-3)';
+                  }}
+                  onMouseLeave={function(e) {
+                    e.currentTarget.style.borderColor = 'rgba(255,255,255,0.06)';
+                    e.currentTarget.style.background  = i % 2 === 0 ? 'var(--charcoal-2)' : 'var(--charcoal-3)';
+                  }}
+                >
+                  {/* Index number */}
+                  <div style={{
+                    fontFamily:    'var(--font-mono)',
+                    fontSize:      '0.6rem',
+                    color:         'var(--pearl-ghost)',
+                    letterSpacing: '0.15em',
+                    marginBottom:  24,
+                  }}>
+                    {String(i + 1).padStart(2, '0')}
+                  </div>
+
+                  {/* Tag */}
+                  <div style={{
+                    fontFamily:    'var(--font-wide)',
+                    fontSize:      '0.55rem',
+                    fontWeight:    600,
+                    letterSpacing: '0.22em',
+                    textTransform: 'uppercase',
+                    color:         'var(--copper)',
+                    marginBottom:  14,
+                  }}>
+                    {item.tag}
+                  </div>
+
+                  {/* Title */}
+                  <h3 style={{
+                    fontFamily:    'var(--font-serif)',
+                    fontSize:      'clamp(1.3rem, 2vw, 1.7rem)',
+                    fontWeight:    400,
+                    color:         'var(--pearl)',
+                    lineHeight:    1.2,
+                    marginBottom:  14,
+                  }}>
+                    {item.title}
+                  </h3>
+
+                  {/* Desc */}
+                  <p style={{
+                    fontFamily:  'var(--font-body)',
+                    fontSize:    '0.85rem',
+                    fontWeight:  300,
+                    color:       'var(--pearl-muted)',
+                    lineHeight:  1.75,
+                    marginBottom: 28,
+                  }}>
+                    {item.desc}
+                  </p>
+
+                  {/* Stat */}
+                  <div style={{
+                    display:       'flex',
+                    alignItems:    'center',
+                    gap:           10,
+                    paddingTop:    20,
+                    borderTop:     '1px solid rgba(255,255,255,0.05)',
+                    fontFamily:    'var(--font-wide)',
+                    fontSize:      '0.6rem',
+                    fontWeight:    600,
+                    letterSpacing: '0.15em',
+                    textTransform: 'uppercase',
+                    color:         'var(--copper-light)',
+                  }}>
+                    <div style={{
+                      width: 20, height: 1,
+                      background: 'var(--copper)',
+                      opacity: 0.5,
+                      flexShrink: 0,
+                    }} />
+                    {item.stat}
+                  </div>
+
+                  {/* Hover top border */}
+                  <div style={{
+                    position:   'absolute',
+                    top: 0, left: 0, right: 0,
+                    height:     1,
+                    background: 'linear-gradient(90deg, transparent, rgba(184,115,51,0.35), transparent)',
+                    opacity:    0,
+                    transition: 'opacity 0.3s ease',
+                  }}
+                    className="hover-line"
+                  />
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      </section>
+
+
+      {/* ══════════════════════════════════
           CTA BANNER
-      ════════════════════════════════ */}
+      ══════════════════════════════════ */}
       <section className="section-sm" ref={ctaRef}>
         <div className="container">
           <div style={{
-            position: 'relative',
-            padding: '72px 64px',
-            border: 'var(--border-bright)',
-            borderRadius: 12,
-            overflow: 'hidden',
-            textAlign: 'center',
-            opacity: ctaVisible ? 1 : 0,
-            transform: ctaVisible ? 'translateY(0)' : 'translateY(30px)',
-            transition: 'all 0.7s ease',
-          }}>
-            {/* Background glow */}
+            display:        'grid',
+            gridTemplateColumns: '1fr auto',
+            alignItems:     'center',
+            gap:            60,
+            padding:        '64px 72px',
+            background:     'var(--charcoal-2)',
+            border:         'var(--border)',
+            position:       'relative',
+            overflow:       'hidden',
+            opacity:        ctaVisible ? 1 : 0,
+            transform:      ctaVisible ? 'translateY(0)' : 'translateY(24px)',
+            transition:     'all 0.7s ease',
+          }}
+            className="cta-banner"
+          >
+
+            {/* Copper corner */}
             <div style={{
-              position: 'absolute', inset: 0,
-              background: 'radial-gradient(ellipse 80% 60% at 50% 50%, rgba(30,132,38,0.1) 0%, transparent 70%)',
-              pointerEvents: 'none',
+              position: 'absolute',
+              top: 0, left: 0,
+              width: 120, height: 120,
+              background: 'radial-gradient(circle at 0% 0%, rgba(184,115,51,0.08) 0%, transparent 70%)',
             }} />
 
-            {/* Corner accents */}
-            {['top-left','top-right','bottom-left','bottom-right'].map(c => (
-              <div key={c} style={{
-                position: 'absolute',
-                [c.includes('top')    ? 'top'    : 'bottom']: 16,
-                [c.includes('left')   ? 'left'   : 'right']:  16,
-                width: 24, height: 24,
-                borderTop:    c.includes('top')    ? '2px solid var(--green-600)' : 'none',
-                borderBottom: c.includes('bottom') ? '2px solid var(--green-600)' : 'none',
-                borderLeft:   c.includes('left')   ? '2px solid var(--green-600)' : 'none',
-                borderRight:  c.includes('right')  ? '2px solid var(--green-600)' : 'none',
-              }} />
-            ))}
-
-            <div className="section-label" style={{ justifyContent: 'center', marginBottom: 20 }}>
-              Limited Seats Available
+            {/* Left */}
+            <div style={{ position: 'relative', zIndex: 1 }}>
+              <div className="eyebrow" style={{ marginBottom: 16 }}>
+                Limited Registration
+              </div>
+              <h2 style={{
+                fontFamily:    'var(--font-serif)',
+                fontSize:      'clamp(2rem, 3.5vw, 3rem)',
+                fontWeight:    300,
+                color:         'var(--pearl)',
+                lineHeight:    1.1,
+                marginBottom:  16,
+              }}>
+                Ready to be part of the{' '}
+                <span style={{ fontStyle: 'italic', color: 'var(--copper-light)' }}>
+                  revolution?
+                </span>
+              </h2>
+              <p style={{
+                fontFamily: 'var(--font-body)',
+                fontSize:   '0.9rem',
+                fontWeight: 300,
+                color:      'var(--pearl-muted)',
+                lineHeight: 1.75,
+                maxWidth:   480,
+              }}>
+                Join 5,000 engineers, researchers, and EV professionals
+                at India's most ambitious electric mobility event of 2026.
+                Free entry. No registration fee.
+              </p>
             </div>
-            <h2 style={{
-              fontFamily: 'var(--font-display)',
-              fontSize: 'clamp(2rem, 4vw, 3.5rem)',
-              color: 'var(--text-primary)',
-              letterSpacing: '0.04em',
-              marginBottom: 16,
-              position: 'relative', zIndex: 1,
-            }}>
-              READY TO BE PART OF THE{' '}
-              <span style={{ color: 'var(--green-400)' }}>REVOLUTION?</span>
-            </h2>
-            <p style={{
-              fontFamily: 'var(--font-body)',
-              fontSize: '1rem',
-              color: 'var(--text-secondary)',
-              maxWidth: 520,
-              margin: '0 auto 40px',
-              lineHeight: 1.7,
-              position: 'relative', zIndex: 1,
-            }}>
-              Join thousands of EV enthusiasts, engineers, and innovators
-              at India's biggest electric vehicle event of the year.
-            </p>
+
+            {/* Right */}
             <div style={{
-              display: 'flex', gap: 16,
-              justifyContent: 'center', flexWrap: 'wrap',
-              position: 'relative', zIndex: 1,
+              display:        'flex',
+              flexDirection:  'column',
+              gap:            12,
+              flexShrink:     0,
+              position:       'relative',
+              zIndex:         1,
             }}>
               <Link to="/vidyut-26">
-                <button className="btn-glow" style={{ padding: '16px 48px', fontSize: '0.8rem' }}>
+                <button className="btn-primary" style={{ whiteSpace: 'nowrap' }}>
                   <span>Register for Vidyut 26</span>
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none"
-                    stroke="currentColor" strokeWidth="2.5">
+                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
                     <path d="M5 12h14M12 5l7 7-7 7"/>
                   </svg>
                 </button>
               </Link>
               <Link to="/founders">
-                <button className="btn-outline">
+                <button className="btn-ghost" style={{ whiteSpace: 'nowrap' }}>
                   <span>Meet the Founders</span>
                 </button>
               </Link>
@@ -751,16 +896,16 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Responsive */}
       <style>{`
-        @media (max-width: 900px) {
-          .hero-grid       { grid-template-columns: 1fr !important; gap: 48px !important; }
-          .stats-grid      { grid-template-columns: repeat(2, 1fr) !important; }
-          .highlights-grid { grid-template-columns: repeat(2, 1fr) !important; }
+        @media (max-width: 1024px) {
+          .bento-master { grid-template-columns: 1fr 1fr !important; }
+          .events-grid  { grid-template-columns: repeat(2,1fr) !important; }
+          .cta-banner   { grid-template-columns: 1fr !important; padding: 48px 40px !important; }
         }
-        @media (max-width: 600px) {
-          .stats-grid      { grid-template-columns: 1fr 1fr !important; }
-          .highlights-grid { grid-template-columns: 1fr !important; }
+        @media (max-width: 700px) {
+          .bento-master { grid-template-columns: 1fr !important; }
+          .events-grid  { grid-template-columns: 1fr !important; }
+          .cta-banner   { padding: 36px 24px !important; }
         }
       `}</style>
     </div>
