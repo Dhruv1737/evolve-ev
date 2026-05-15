@@ -2,7 +2,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 
 function useReveal(threshold) {
-  var t = threshold || 0.12;
+  var t = threshold || 0.1;
   var ref = useRef(null);
   var s = useState(false);
   var visible = s[0];
@@ -23,13 +23,12 @@ function useReveal(threshold) {
 function Counter(props) {
   var target   = props.target;
   var suffix   = props.suffix || '';
-  var duration = props.duration || 2000;
-  var s = useState(0);
+  var duration = props.duration || 2200;
+  var s        = useState(0);
   var count    = s[0];
   var setCount = s[1];
   var ref      = useRef(null);
   var started  = useRef(false);
-
   useEffect(function() {
     var observer = new IntersectionObserver(function(entries) {
       if (entries[0].isIntersecting && !started.current) {
@@ -37,7 +36,7 @@ function Counter(props) {
         var start = performance.now();
         function tick(now) {
           var progress = Math.min((now - start) / duration, 1);
-          var ease = 1 - Math.pow(1 - progress, 3);
+          var ease = 1 - Math.pow(1 - progress, 4);
           setCount(Math.floor(ease * target));
           if (progress < 1) requestAnimationFrame(tick);
         }
@@ -47,93 +46,100 @@ function Counter(props) {
     if (ref.current) observer.observe(ref.current);
     return function() { observer.disconnect(); };
   }, [target, duration]);
-
   return React.createElement('span', { ref: ref }, count + suffix);
 }
 
-var TIMELINE_ITEMS = [
+var TIMELINE = [
   {
-    year: '2021',
-    title: 'EVOLVE Founded',
-    desc: 'Three NIT Bhopal students — Yash, Ayush, and Aman — launch EVOLVE with a single electric scooter on display and a vision to build India\'s premier student EV platform. The first Vidyut draws 200 curious attendees and sparks a movement.',
+    year:  '2021',
+    title: 'The Beginning',
+    desc:  'Three NIT Bhopal undergraduates launch EVOLVE with a single electric scooter on display and a conviction that India\'s EV revolution needed a student voice. The inaugural Vidyut draws 200 attendees and sets a precedent that the campus has never seen before.',
   },
   {
-    year: '2022',
-    title: 'First Industry Partnership',
-    desc: 'EVOLVE secures its first corporate partnership with a leading EV manufacturer, bringing real production vehicles to campus for the first time. Attendance triples. The Vidyut Speed Trials are introduced, instantly becoming the crowd favourite.',
+    year:  '2022',
+    title: 'First Industry Bridge',
+    desc:  'EVOLVE secures its first corporate partnership with a leading EV manufacturer. Production vehicles arrive on campus for the first time. Attendance triples. The Vidyut Speed Trials debut and instantly become the most-anticipated event of the conclave.',
   },
   {
-    year: '2023',
-    title: 'National Recognition',
-    desc: 'Vidyut 23 is covered by three national publications and draws teams from 18 states. EVOLVE launches the EV Hackathon with prize money of Rs 2 Lakhs. Two Hackathon winners go on to found funded startups within the year.',
+    year:  '2023',
+    title: 'National Stage',
+    desc:  'Vidyut 23 draws teams from 18 states and earns coverage in three national publications. The EV Hackathon launches with a ₹2L prize pool. Two winning teams go on to found funded startups within the calendar year — and EVOLVE\'s reputation changes permanently.',
   },
   {
-    year: '2024',
-    title: 'Scale and Impact',
-    desc: 'Footfall crosses 3,000 for the first time. EVOLVE partners with the Ministry of Heavy Industries for a policy panel. The Battery Tech Symposium debuts with speakers from ISRO, Ola Electric, and Tata Motors.',
+    year:  '2024',
+    title: 'Institutional Recognition',
+    desc:  'Footfall crosses 3,000 for the first time. EVOLVE partners with the Ministry of Heavy Industries for a dedicated policy panel. The Battery Tech Symposium debuts with speakers from ISRO, Ola Electric, and Tata Motors EV division.',
   },
   {
-    year: '2025',
-    title: 'Vidyut 25 — Record Edition',
-    desc: 'Over 4,500 attendees. 35 corporate exhibitors. Prize pool of Rs 4 Lakhs. Vidyut 25 cements EVOLVE as India\'s largest student-led EV conclave. A dedicated charging infrastructure workshop draws engineers from 9 countries.',
+    year:  '2025',
+    title: 'Record Edition',
+    desc:  'Vidyut 25 — 4,500 attendees, 35 corporate exhibitors, ₹4L prize pool. EVOLVE is formally recognised as India\'s largest student-led electric vehicle conclave. Engineers from 9 countries attend the charging infrastructure workshop.',
   },
   {
-    year: '2026',
-    title: 'Vidyut 26 — Current of Change',
-    desc: 'The 26th edition arrives with the boldest theme yet. 5,000 expected attendees, Rs 5 Lakh hackathon, international speakers, and the launch of the EVOLVE EV Research Grant — funding student projects that can change how India moves.',
+    year:  '2026',
+    title: 'Current of Change',
+    desc:  'The 26th edition arrives with the most ambitious theme yet. 5,000 expected attendees, ₹6.5L prize pool, international keynote speakers, and the launch of the EVOLVE EV Research Grant — seeding student projects that will shape how India moves.',
   },
 ];
 
 var VALUES = [
   {
-    icon: '⚡',
+    index: '01',
     title: 'Innovation First',
-    desc: 'We believe breakthroughs happen when young engineers are given space, resources, and the freedom to fail. Every EVOLVE programme is designed to push boundaries, not protect them.',
+    desc:  'Breakthroughs happen when young engineers are given space to fail without consequence. Every EVOLVE programme is designed to push boundaries, not protect them.',
   },
   {
-    icon: '🌍',
+    index: '02',
     title: 'Sustainability at Core',
-    desc: 'Electric mobility is not just a technology choice — it is a responsibility. We build every event, every workshop, and every partnership with the planet\'s future as the non-negotiable bottom line.',
+    desc:  'Electric mobility is not a technology choice — it is a responsibility. We build every event, every workshop, and every partnership with the planet\'s future as the non-negotiable bottom line.',
   },
   {
-    icon: '🤝',
+    index: '03',
     title: 'Community Driven',
-    desc: 'EVOLVE is nothing without its community of 200 volunteers, 40 mentors, and thousands of attendees who show up every year believing that student-led change is real change.',
+    desc:  'EVOLVE is nothing without its 200 volunteers, 40 mentors, and thousands of attendees who show up each year believing that student-led change is real and lasting change.',
   },
   {
-    icon: '🎯',
-    title: 'Excellence Always',
-    desc: 'From the quality of our speakers to the design of our events, we hold ourselves to a standard that makes industry professionals take notice. Good enough has never been good enough for us.',
-  },
-  {
-    icon: '🔓',
+    index: '04',
     title: 'Open Access',
-    desc: 'Knowledge about the electric future should not be gatekept. Every EVOLVE event is free to attend, every workshop is open to all students, and every insight shared at Vidyut is shared with the world.',
+    desc:  'Knowledge about the electric future should not be gatekept. Every EVOLVE event is free to attend, every workshop open to all students, every insight shared with the world.',
   },
   {
-    icon: '🚀',
+    index: '05',
+    title: 'Excellence Always',
+    desc:  'From the quality of our speakers to the design of our events, we hold ourselves to a standard that makes industry professionals take notice — and want to come back.',
+  },
+  {
+    index: '06',
     title: 'Action Over Talk',
-    desc: 'We do not just discuss the EV revolution — we build it. From running live speed trials to funding student prototypes, EVOLVE turns conversations into hardware, and ideas into roads driven.',
+    desc:  'We do not discuss the EV revolution — we build it. From live speed trials to funded prototypes, EVOLVE turns conversations into hardware and ideas into roads driven.',
   },
 ];
 
 var TEAM = [
-  { name: 'Priya Verma',    role: 'Head of Design',       dept: 'Creative' },
-  { name: 'Rohan Mehta',    role: 'Head of Tech',          dept: 'Engineering' },
-  { name: 'Simran Kaur',    role: 'Head of Sponsorship',   dept: 'Partnerships' },
-  { name: 'Dev Patel',      role: 'Head of Operations',    dept: 'Logistics' },
-  { name: 'Nisha Gupta',    role: 'Head of Media',         dept: 'Communications' },
-  { name: 'Arjun Singh',    role: 'Head of Competitions',  dept: 'Events' },
-  { name: 'Kavya Reddy',    role: 'Head of Workshops',     dept: 'Education' },
-  { name: 'Ishan Dubey',    role: 'Head of Volunteer Ops', dept: 'Community' },
+  { name: 'Priya Verma',   role: 'Head of Design',      dept: 'Creative'       },
+  { name: 'Rohan Mehta',   role: 'Head of Technology',  dept: 'Engineering'    },
+  { name: 'Simran Kaur',   role: 'Head of Sponsorship', dept: 'Partnerships'   },
+  { name: 'Dev Patel',     role: 'Head of Operations',  dept: 'Logistics'      },
+  { name: 'Nisha Gupta',   role: 'Head of Media',       dept: 'Communications' },
+  { name: 'Arjun Singh',   role: 'Head of Competitions',dept: 'Events'         },
+  { name: 'Kavya Reddy',   role: 'Head of Workshops',   dept: 'Education'      },
+  { name: 'Ishan Dubey',   role: 'Head of Volunteers',  dept: 'Community'      },
+];
+
+var STATS = [
+  { value: 200,  suffix: '+', label: 'Active Members'        },
+  { value: 26,   suffix: '',  label: 'Editions of Vidyut'    },
+  { value: 5000, suffix: '+', label: 'Annual Attendees'      },
+  { value: 30,   suffix: '+', label: 'Industry Partners'     },
+  { value: 10,   suffix: '+', label: 'Startups Launched'     },
 ];
 
 export default function About() {
-  var heroS      = useState(false);
-  var heroVisible    = heroS[0];
-  var setHeroVisible = heroS[1];
+  var heroState      = useState(false);
+  var heroVisible    = heroState[0];
+  var setHeroVisible = heroState[1];
 
-  var r1 = useReveal(0.1);
+  var r1 = useReveal(0.08);
   var storyRef     = r1[0];
   var storyVisible = r1[1];
 
@@ -141,7 +147,7 @@ export default function About() {
   var statsRef     = r2[0];
   var statsVisible = r2[1];
 
-  var r3 = useReveal();
+  var r3 = useReveal(0.05);
   var timelineRef     = r3[0];
   var timelineVisible = r3[1];
 
@@ -158,212 +164,326 @@ export default function About() {
   var ctaVisible = r6[1];
 
   useEffect(function() {
-    var t = setTimeout(function() { setHeroVisible(true); }, 100);
+    var t = setTimeout(function() { setHeroVisible(true); }, 120);
     return function() { clearTimeout(t); };
   }, []);
 
   return (
     <div style={{ overflowX: 'hidden' }}>
 
-      {/* ═══════════════════════════
+      {/* ══════════════════════════════
           HERO
-      ═══════════════════════════ */}
+      ══════════════════════════════ */}
       <section style={{
-        minHeight: '70vh',
-        display: 'flex', alignItems: 'center',
-        position: 'relative', overflow: 'hidden',
-        paddingTop: 130, paddingBottom: 80,
+        minHeight:     '80vh',
+        display:       'flex',
+        alignItems:    'flex-end',
+        position:      'relative',
+        overflow:      'hidden',
+        paddingTop:    120,
+        paddingBottom: 80,
       }}>
 
         {/* BG image */}
         <div style={{
-          position: 'absolute', inset: 0,
-          backgroundImage: 'url(https://images.unsplash.com/photo-1473341304170-971dccb5ac1e?w=1600&q=80)',
-          backgroundSize: 'cover', backgroundPosition: 'center',
-          filter: 'brightness(0.08) saturate(0.3) hue-rotate(80deg)',
-        }} />
-        <div style={{
-          position: 'absolute', inset: 0,
-          background: 'linear-gradient(135deg, rgba(5,10,5,0.98) 50%, rgba(20,83,26,0.3) 100%)',
+          position:           'absolute',
+          inset:              0,
+          backgroundImage:    'url(https://images.unsplash.com/photo-1473341304170-971dccb5ac1e?w=1600&q=90)',
+          backgroundSize:     'cover',
+          backgroundPosition: 'center 40%',
+          filter:             'brightness(0.12) contrast(1.2) saturate(0.25)',
         }} />
 
-        {/* Animated arc */}
+        {/* Overlays */}
         <div style={{
-          position: 'absolute',
-          top: '50%', right: '-100px',
-          transform: 'translateY(-50%)',
-          width: 500, height: 500,
-          border: '1px solid rgba(46,204,55,0.07)',
-          borderRadius: '50%',
-          animation: 'spin-slow 30s linear infinite',
+          position:   'absolute',
+          inset:      0,
+          background: 'linear-gradient(135deg, rgba(10,10,11,0.98) 40%, rgba(10,10,11,0.7) 100%)',
         }} />
         <div style={{
-          position: 'absolute',
-          top: '50%', right: '-60px',
-          transform: 'translateY(-50%)',
-          width: 360, height: 360,
-          border: '1px dashed rgba(46,204,55,0.05)',
-          borderRadius: '50%',
-          animation: 'spin-reverse 20s linear infinite',
+          position:   'absolute',
+          bottom: 0, left: 0, right: 0,
+          height:     '45%',
+          background: 'linear-gradient(0deg, var(--charcoal) 0%, transparent 100%)',
         }} />
 
-        <div className="container" style={{ position: 'relative', zIndex: 2 }}>
+        {/* Decorative right element */}
+        <div style={{
+          position:   'absolute',
+          top:        '20%',
+          right:      '8%',
+          width:      280,
+          height:     280,
+          border:     '1px solid rgba(184,115,51,0.06)',
+          borderRadius: '50%',
+          animation:  'rotateSlow 40s linear infinite',
+          pointerEvents: 'none',
+        }} />
+        <div style={{
+          position:   'absolute',
+          top:        '25%',
+          right:      '11%',
+          width:      200,
+          height:     200,
+          border:     '1px solid rgba(184,115,51,0.04)',
+          borderRadius: '50%',
+          animation:  'rotateSlow 28s linear infinite reverse',
+          pointerEvents: 'none',
+        }} />
+
+        <div className="container" style={{ position: 'relative', zIndex: 2, width: '100%' }}>
+
           <div style={{
-            opacity: heroVisible ? 1 : 0,
-            transform: heroVisible ? 'translateY(0)' : 'translateY(20px)',
+            opacity:    heroVisible ? 1 : 0,
+            transform:  heroVisible ? 'translateY(0)' : 'translateY(16px)',
             transition: 'all 0.6s ease 0.1s',
+            marginBottom: 24,
           }}>
-            <span className="badge" style={{ marginBottom: 28, display: 'inline-flex' }}>
-              Our Story — Est. 2021
-            </span>
+            <span className="badge">Est. 2021 — NIT Bhopal</span>
           </div>
 
           <div style={{
-            opacity: heroVisible ? 1 : 0,
-            transform: heroVisible ? 'translateY(0)' : 'translateY(30px)',
-            transition: 'all 0.7s ease 0.2s',
+            opacity:    heroVisible ? 1 : 0,
+            transform:  heroVisible ? 'translateY(0)' : 'translateY(28px)',
+            transition: 'all 0.8s ease 0.2s',
           }}>
             <h1 style={{
-              fontFamily: 'var(--font-display)',
-              fontSize: 'clamp(4.5rem, 11vw, 10rem)',
-              lineHeight: 0.88, letterSpacing: '0.02em',
+              fontFamily:    'var(--font-serif)',
+              fontSize:      'clamp(5rem, 13vw, 12rem)',
+              fontWeight:    300,
+              lineHeight:    0.88,
+              letterSpacing: '-0.01em',
+              marginBottom:  36,
             }}>
               <span style={{
-                display: 'block', color: 'var(--text-muted)',
-                fontSize: '30%', fontFamily: 'var(--font-mono)',
-                letterSpacing: '0.35em', marginBottom: 14,
+                display:  'block',
+                color:    'var(--pearl-muted)',
+                fontSize: '28%',
+                fontFamily: 'var(--font-wide)',
+                fontWeight: 600,
+                letterSpacing: '0.4em',
+                textTransform: 'uppercase',
+                marginBottom: 16,
               }}>
-                WE ARE
+                We are
               </span>
-              <span style={{ display: 'block', color: 'var(--green-400)', textShadow: '0 0 60px rgba(46,204,55,0.35)' }}>
-                EVOLVE
+              <span style={{
+                display:   'block',
+                color:     'var(--pearl)',
+              }}>
+                Evolve
               </span>
             </h1>
           </div>
 
           <div style={{
-            opacity: heroVisible ? 1 : 0,
-            transform: heroVisible ? 'translateY(0)' : 'translateY(20px)',
-            transition: 'all 0.7s ease 0.35s',
-            maxWidth: 640, marginTop: 28,
-          }}>
+            display:             'grid',
+            gridTemplateColumns: '1fr 1fr',
+            gap:                 80,
+            opacity:    heroVisible ? 1 : 0,
+            transform:  heroVisible ? 'translateY(0)' : 'translateY(16px)',
+            transition: 'all 0.8s ease 0.38s',
+          }}
+            className="about-hero-bottom"
+          >
             <p style={{
-              fontFamily: 'var(--font-body)',
-              fontSize: '1.1rem',
-              color: 'var(--text-secondary)',
-              lineHeight: 1.8,
+              fontFamily:  'var(--font-body)',
+              fontSize:    '1.05rem',
+              fontWeight:  300,
+              color:       'var(--pearl-muted)',
+              lineHeight:  1.8,
+              maxWidth:    520,
             }}>
-              India's most passionate student community for electric mobility.
-              We are engineers, dreamers, organisers, and advocates —
-              united by one belief: that the future of transport is electric,
-              and that the future starts on campus.
+              India's most passionate student community for electric
+              mobility. We are engineers, dreamers, organisers, and
+              advocates — united by the belief that the future of
+              transport is electric, and that future starts on campus.
             </p>
+            <div style={{
+              display:   'flex',
+              gap:       48,
+              alignSelf: 'flex-end',
+              flexWrap:  'wrap',
+            }}>
+              {[
+                { val: '200+', label: 'Members'  },
+                { val: '26',   label: 'Editions' },
+                { val: '5K+',  label: 'Reached'  },
+              ].map(function(s) {
+                return (
+                  <div key={s.label}>
+                    <div style={{
+                      fontFamily: 'var(--font-serif)',
+                      fontSize:   '2.6rem',
+                      fontWeight: 300,
+                      color:      'var(--copper-light)',
+                      lineHeight: 1,
+                      marginBottom: 6,
+                    }}>
+                      {s.val}
+                    </div>
+                    <div style={{
+                      fontFamily:    'var(--font-wide)',
+                      fontSize:      '0.52rem',
+                      fontWeight:    600,
+                      letterSpacing: '0.22em',
+                      textTransform: 'uppercase',
+                      color:         'var(--pearl-ghost)',
+                    }}>
+                      {s.label}
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
           </div>
 
+          {/* Bottom divider */}
           <div style={{
-            display: 'flex', gap: 16, marginTop: 44, flexWrap: 'wrap',
-            opacity: heroVisible ? 1 : 0,
-            transition: 'all 0.7s ease 0.5s',
-          }}>
-            <Link to="/vidyut-26">
-              <button className="btn-glow" style={{ padding: '14px 40px' }}>
-                <span>Explore Vidyut 26</span>
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
-                  <path d="M5 12h14M12 5l7 7-7 7"/>
-                </svg>
-              </button>
-            </Link>
-            <Link to="/founders">
-              <button className="btn-outline">
-                <span>Meet the Founders</span>
-              </button>
-            </Link>
-          </div>
+            marginTop:  64,
+            height:     1,
+            background: 'linear-gradient(90deg, rgba(184,115,51,0.3), rgba(255,255,255,0.06), transparent)',
+            opacity:    heroVisible ? 1 : 0,
+            transition: 'opacity 1s ease 0.65s',
+          }} />
         </div>
       </section>
 
-      {/* ═══════════════════════════
-          STORY SECTION
-      ═══════════════════════════ */}
+
+      {/* ══════════════════════════════
+          STORY
+      ══════════════════════════════ */}
       <section className="section" ref={storyRef}>
         <div className="container">
           <div style={{
-            display: 'grid',
+            display:             'grid',
             gridTemplateColumns: '1fr 1fr',
-            gap: 80, alignItems: 'center',
+            gap:                 80,
+            alignItems:          'center',
           }}
             className="story-grid"
           >
+
+            {/* Left — text */}
             <div style={{
-              opacity: storyVisible ? 1 : 0,
-              transform: storyVisible ? 'translateX(0)' : 'translateX(-40px)',
+              opacity:    storyVisible ? 1 : 0,
+              transform:  storyVisible ? 'translateX(0)' : 'translateX(-32px)',
               transition: 'all 0.8s ease',
             }}>
-              <div className="section-label">Who We Are</div>
+              <div className="eyebrow">Who We Are</div>
               <h2 style={{
-                fontFamily: 'var(--font-display)',
-                fontSize: 'clamp(2rem, 4vw, 3.5rem)',
-                letterSpacing: '0.04em', marginBottom: 28,
+                fontFamily:  'var(--font-serif)',
+                fontSize:    'clamp(2rem, 3.5vw, 3.2rem)',
+                fontWeight:  300,
+                color:       'var(--pearl)',
+                lineHeight:  1.05,
+                marginBottom: 32,
               }}>
-                MORE THAN AN{' '}
-                <span style={{ color: 'var(--green-400)', textShadow: '0 0 20px rgba(46,204,55,0.3)' }}>
-                  EV CLUB
+                More than an EV club.{' '}
+                <span style={{ fontStyle: 'italic', color: 'var(--copper-light)' }}>
+                  A movement.
                 </span>
               </h2>
 
               {[
                 'EVOLVE is the electric vehicle and sustainable mobility student body of NIT Bhopal. Founded in 2021 by three undergraduate engineers who believed that India\'s EV revolution needed a student voice, EVOLVE has grown into a 200-member organisation that is reshaping how engineering students engage with the future of transport.',
-                'We are not a club that talks about electric vehicles — we build them, race them, and present them on stages that matter. Our members have gone on to work at Ola Electric, Tata Motors EV division, and ISRO\'s propulsion lab. Several have founded their own EV startups, two of which have raised seed funding. EVOLVE is their launchpad.',
-                'Through Vidyut, our annual conclave, we create India\'s most immersive campus EV experience. Through our workshops and symposiums, we democratise access to cutting-edge EV knowledge. And through our competitions, we give young engineers the chance to prove that world-class innovation does not require a Silicon Valley zip code — just a good problem and the drive to solve it.',
+                'We are not a club that talks about electric vehicles — we build them, race them, and present them on stages that matter. Our members have gone on to work at Ola Electric, Tata Motors EV division, and ISRO\'s propulsion lab. Several have founded their own EV startups, two of which have raised institutional seed funding from marquee investors.',
+                'Through Vidyut, our annual conclave, we create India\'s most immersive campus EV experience. Through our workshops and symposiums, we democratise access to cutting-edge knowledge. And through our competitions, we prove that world-class engineering innovation does not require a Silicon Valley zip code — just a real problem and the drive to solve it.',
               ].map(function(para, i) {
                 return (
                   <p key={i} style={{
-                    fontFamily: 'var(--font-body)',
-                    fontSize: '0.9rem',
-                    color: i === 0 ? 'var(--text-secondary)' : 'var(--text-muted)',
-                    lineHeight: 1.85,
-                    marginBottom: 18,
+                    fontFamily:  'var(--font-body)',
+                    fontSize:    '0.9rem',
+                    fontWeight:  300,
+                    color:       i === 0 ? 'var(--pearl-dim)' : 'var(--pearl-muted)',
+                    lineHeight:  1.85,
+                    marginBottom: 16,
                   }}>
                     {para}
                   </p>
                 );
               })}
+
+              <div style={{ marginTop: 36, display: 'flex', gap: 14 }}>
+                <Link to="/founders">
+                  <button className="btn-primary">
+                    <span>Meet the Founders</span>
+                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+                      <path d="M5 12h14M12 5l7 7-7 7"/>
+                    </svg>
+                  </button>
+                </Link>
+                <Link to="/vidyut-26">
+                  <button className="btn-ghost">
+                    <span>Explore Vidyut 26</span>
+                  </button>
+                </Link>
+              </div>
             </div>
 
-            {/* Right image mosaic */}
+            {/* Right — image mosaic */}
             <div style={{
-              opacity: storyVisible ? 1 : 0,
-              transform: storyVisible ? 'translateX(0)' : 'translateX(40px)',
-              transition: 'all 0.8s ease 0.15s',
-              display: 'grid',
+              display:             'grid',
               gridTemplateColumns: '1fr 1fr',
-              gridTemplateRows: '1fr 1fr',
-              gap: 12,
-              height: 480,
+              gridTemplateRows:    '260px 200px',
+              gap:                 10,
+              opacity:    storyVisible ? 1 : 0,
+              transform:  storyVisible ? 'translateX(0)' : 'translateX(32px)',
+              transition: 'all 0.8s ease 0.15s',
             }}>
               {[
-                { src: 'https://images.unsplash.com/photo-1593941707882-a5bba14938c7?w=600&q=80', span: 'row-span-2' },
-                { src: 'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=600&q=80', span: '' },
-                { src: 'https://images.unsplash.com/photo-1606813907291-d86efa9b94db?w=600&q=80', span: '' },
+                {
+                  src:  'https://images.unsplash.com/photo-1593941707882-a5bba14938c7?w=700&q=85',
+                  span: true,
+                },
+                {
+                  src:  'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=700&q=85',
+                  span: false,
+                },
+                {
+                  src:  'https://images.unsplash.com/photo-1606813907291-d86efa9b94db?w=700&q=85',
+                  span: false,
+                },
               ].map(function(img, i) {
                 return (
                   <div key={i} style={{
-                    gridRow: i === 0 ? 'span 2' : 'span 1',
-                    borderRadius: 8, overflow: 'hidden',
-                    border: '1px solid rgba(46,204,55,0.12)',
+                    gridRow:    i === 0 ? 'span 2' : 'span 1',
+                    overflow:   'hidden',
+                    border:     'var(--border)',
+                    position:   'relative',
                   }}>
                     <img
                       src={img.src}
                       alt="EVOLVE"
                       style={{
-                        width: '100%', height: '100%',
-                        objectFit: 'cover',
-                        filter: 'brightness(0.65) saturate(0.6) hue-rotate(50deg)',
-                        transition: 'transform 0.5s ease',
+                        width:      '100%',
+                        height:     '100%',
+                        objectFit:  'cover',
+                        filter:     'brightness(0.55) contrast(1.1) saturate(0.35)',
+                        transition: 'transform 0.7s ease, filter 0.5s ease',
                       }}
-                      onMouseEnter={function(e) { e.currentTarget.style.transform = 'scale(1.05)'; }}
-                      onMouseLeave={function(e) { e.currentTarget.style.transform = 'scale(1)'; }}
+                      onMouseEnter={function(e) {
+                        e.currentTarget.style.transform = 'scale(1.05)';
+                        e.currentTarget.style.filter    = 'brightness(0.65) contrast(1.05) saturate(0.5)';
+                      }}
+                      onMouseLeave={function(e) {
+                        e.currentTarget.style.transform = 'scale(1)';
+                        e.currentTarget.style.filter    = 'brightness(0.55) contrast(1.1) saturate(0.35)';
+                      }}
                     />
+
+                    {/* Copper overlay on first image */}
+                    {i === 0 && (
+                      <div style={{
+                        position:   'absolute',
+                        bottom:     0,
+                        left:       0,
+                        right:      0,
+                        height:     '40%',
+                        background: 'linear-gradient(0deg, rgba(184,115,51,0.12) 0%, transparent 100%)',
+                        pointerEvents: 'none',
+                      }} />
+                    )}
                   </div>
                 );
               })}
@@ -372,52 +492,61 @@ export default function About() {
         </div>
       </section>
 
-      {/* ═══════════════════════════
+
+      {/* ══════════════════════════════
           STATS BAR
-      ═══════════════════════════ */}
-      <section className="section-sm" ref={statsRef} style={{
-        background: 'rgba(10,26,10,0.3)',
-        borderTop: 'var(--border)', borderBottom: 'var(--border)',
+      ══════════════════════════════ */}
+      <section ref={statsRef} style={{
+        borderTop:    'var(--border)',
+        borderBottom: 'var(--border)',
+        background:   'var(--charcoal-2)',
+        padding:      '0',
       }}>
         <div className="container">
           <div style={{
-            display: 'grid',
-            gridTemplateColumns: 'repeat(5,1fr)',
-            gap: 0, textAlign: 'center',
+            display:             'grid',
+            gridTemplateColumns: 'repeat(5, 1fr)',
+            gap:                 0,
           }}
             className="stats-bar"
           >
-            {[
-              { value: 200,  suffix: '+',  label: 'Active Members' },
-              { value: 26,   suffix: '',   label: 'Editions of Vidyut' },
-              { value: 5000, suffix: '+',  label: 'Annual Attendees' },
-              { value: 30,   suffix: '+',  label: 'Industry Partners' },
-              { value: 10,   suffix: '+',  label: 'Startups Launched' },
-            ].map(function(stat, i) {
+            {STATS.map(function(stat, i) {
               return (
                 <div key={stat.label} style={{
-                  padding: '40px 20px',
-                  borderRight: i < 4 ? 'var(--border)' : 'none',
-                  opacity: statsVisible ? 1 : 0,
-                  transform: statsVisible ? 'translateY(0)' : 'translateY(20px)',
-                  transition: 'all 0.5s ease ' + (i * 0.08) + 's',
+                  padding:     '52px 32px',
+                  borderRight: i < STATS.length - 1 ? 'var(--border)' : 'none',
+                  textAlign:   'center',
+                  opacity:     statsVisible ? 1 : 0,
+                  transform:   statsVisible ? 'translateY(0)' : 'translateY(20px)',
+                  transition:  'all 0.5s ease ' + (i * 0.08) + 's',
+                  position:    'relative',
                 }}>
+                  {/* Top copper accent on hover */}
                   <div style={{
-                    fontFamily: 'var(--font-display)',
-                    fontSize: 'clamp(2rem, 3vw, 3rem)',
-                    color: 'var(--green-400)',
-                    textShadow: '0 0 20px rgba(46,204,55,0.3)',
-                    lineHeight: 1,
-                    marginBottom: 8,
+                    position:   'absolute',
+                    top: 0, left: '20%', right: '20%',
+                    height:     1,
+                    background: 'var(--copper)',
+                    opacity:    0.3,
+                  }} />
+
+                  <div style={{
+                    fontFamily:  'var(--font-serif)',
+                    fontSize:    'clamp(2.2rem, 3.5vw, 3.2rem)',
+                    fontWeight:  300,
+                    color:       'var(--copper-light)',
+                    lineHeight:  1,
+                    marginBottom: 10,
                   }}>
                     <Counter target={stat.value} suffix={stat.suffix} />
                   </div>
                   <div style={{
-                    fontFamily: 'var(--font-mono)',
-                    fontSize: '0.58rem',
-                    color: 'var(--text-muted)',
-                    letterSpacing: '0.18em',
+                    fontFamily:    'var(--font-wide)',
+                    fontSize:      '0.55rem',
+                    fontWeight:    600,
+                    letterSpacing: '0.2em',
                     textTransform: 'uppercase',
+                    color:         'var(--pearl-ghost)',
                   }}>
                     {stat.label}
                   </div>
@@ -428,189 +557,250 @@ export default function About() {
         </div>
       </section>
 
-      {/* ═══════════════════════════
+
+      {/* ══════════════════════════════
           TIMELINE
-      ═══════════════════════════ */}
+      ══════════════════════════════ */}
       <section className="section" ref={timelineRef}>
         <div className="container">
-          <div style={{ textAlign: 'center', marginBottom: 72 }}>
-            <div className="section-label" style={{ justifyContent: 'center' }}>
-              Our Journey
-            </div>
-            <h2 style={{
-              fontFamily: 'var(--font-display)',
-              fontSize: 'clamp(2.5rem, 5vw, 4rem)',
-              letterSpacing: '0.04em',
-            }}>
-              FROM SPARK TO{' '}
-              <span style={{ color: 'var(--green-400)' }}>REVOLUTION</span>
-            </h2>
-          </div>
 
-          {/* Timeline */}
-          <div style={{ position: 'relative' }}>
+          <div style={{
+            display:             'grid',
+            gridTemplateColumns: '280px 1fr',
+            gap:                 80,
+          }}
+            className="timeline-layout"
+          >
 
-            {/* Centre line */}
+            {/* Sticky left label */}
             <div style={{
-              position: 'absolute',
-              left: '50%', top: 0, bottom: 0,
-              width: 1,
-              background: 'linear-gradient(180deg, transparent, rgba(46,204,55,0.25), transparent)',
-              transform: 'translateX(-50%)',
-            }} />
-
-            {TIMELINE_ITEMS.map(function(item, i) {
-              var isLeft = i % 2 === 0;
-              return (
-                <div key={item.year} style={{
-                  display: 'grid',
-                  gridTemplateColumns: '1fr 60px 1fr',
-                  marginBottom: 48,
-                  opacity: timelineVisible ? 1 : 0,
-                  transform: timelineVisible ? 'translateY(0)' : 'translateY(30px)',
-                  transition: 'all 0.6s ease ' + (i * 0.1) + 's',
-                }}>
-
-                  {/* Left slot */}
-                  <div style={{
-                    paddingRight: 40, textAlign: 'right',
-                    display: 'flex', flexDirection: 'column',
-                    alignItems: 'flex-end', justifyContent: 'center',
-                  }}>
-                    {isLeft && (
-                      <div className="card" style={{ padding: '28px 28px', borderRadius: 8, maxWidth: 420, textAlign: 'left' }}>
-                        <div style={{
-                          fontFamily: 'var(--font-display)',
-                          fontSize: '1.4rem', color: 'var(--green-400)',
-                          letterSpacing: '0.06em', marginBottom: 6,
-                        }}>
-                          {item.title}
-                        </div>
-                        <p style={{
-                          fontFamily: 'var(--font-body)',
-                          fontSize: '0.85rem', color: 'var(--text-muted)', lineHeight: 1.8,
-                        }}>
-                          {item.desc}
-                        </p>
-                      </div>
-                    )}
-                  </div>
-
-                  {/* Centre dot */}
-                  <div style={{
-                    display: 'flex', flexDirection: 'column',
-                    alignItems: 'center', justifyContent: 'center', gap: 6,
-                  }}>
-                    <div style={{
-                      width: 14, height: 14,
-                      background: 'var(--green-500)',
-                      borderRadius: '50%',
-                      border: '3px solid var(--black)',
-                      boxShadow: '0 0 16px rgba(46,204,55,0.5)',
-                      flexShrink: 0,
-                    }} />
-                    <div style={{
-                      fontFamily: 'var(--font-display)',
-                      fontSize: '1rem', color: 'var(--green-600)',
-                      letterSpacing: '0.1em',
-                    }}>
-                      {item.year}
-                    </div>
-                  </div>
-
-                  {/* Right slot */}
-                  <div style={{
-                    paddingLeft: 40,
-                    display: 'flex', flexDirection: 'column',
-                    alignItems: 'flex-start', justifyContent: 'center',
-                  }}>
-                    {!isLeft && (
-                      <div className="card" style={{ padding: '28px 28px', borderRadius: 8, maxWidth: 420 }}>
-                        <div style={{
-                          fontFamily: 'var(--font-display)',
-                          fontSize: '1.4rem', color: 'var(--green-400)',
-                          letterSpacing: '0.06em', marginBottom: 6,
-                        }}>
-                          {item.title}
-                        </div>
-                        <p style={{
-                          fontFamily: 'var(--font-body)',
-                          fontSize: '0.85rem', color: 'var(--text-muted)', lineHeight: 1.8,
-                        }}>
-                          {item.desc}
-                        </p>
-                      </div>
-                    )}
-                  </div>
+              opacity:    timelineVisible ? 1 : 0,
+              transform:  timelineVisible ? 'translateX(0)' : 'translateX(-24px)',
+              transition: 'all 0.7s ease',
+            }}>
+              <div style={{ position: 'sticky', top: 120 }}>
+                <div className="eyebrow" style={{ marginBottom: 20 }}>
+                  Our Journey
                 </div>
-              );
-            })}
+                <h2 style={{
+                  fontFamily:  'var(--font-serif)',
+                  fontSize:    'clamp(2rem, 3.5vw, 3rem)',
+                  fontWeight:  300,
+                  color:       'var(--pearl)',
+                  lineHeight:  1.05,
+                  marginBottom: 24,
+                }}>
+                  From spark{' '}
+                  <span style={{ fontStyle: 'italic', color: 'var(--copper-light)' }}>
+                    to revolution.
+                  </span>
+                </h2>
+                <p style={{
+                  fontFamily:  'var(--font-body)',
+                  fontSize:    '0.85rem',
+                  fontWeight:  300,
+                  color:       'var(--pearl-muted)',
+                  lineHeight:  1.8,
+                }}>
+                  Six years. Six editions. One relentless conviction that India's students could build the electric future — if someone gave them the right stage.
+                </p>
+              </div>
+            </div>
+
+            {/* Timeline entries */}
+            <div style={{ position: 'relative' }}>
+
+              {/* Vertical line */}
+              <div style={{
+                position:   'absolute',
+                top: 8, bottom: 8,
+                left:       0,
+                width:      1,
+                background: 'linear-gradient(180deg, var(--copper), rgba(184,115,51,0.1))',
+                opacity:    0.25,
+              }} />
+
+              <div style={{
+                display:       'flex',
+                flexDirection: 'column',
+                gap:           0,
+              }}>
+                {TIMELINE.map(function(item, i) {
+                  return (
+                    <div key={item.year} style={{
+                      display:   'grid',
+                      gridTemplateColumns: '80px 1fr',
+                      gap:       32,
+                      padding:   '40px 0',
+                      borderBottom: i < TIMELINE.length - 1 ? 'var(--border)' : 'none',
+                      opacity:   timelineVisible ? 1 : 0,
+                      transform: timelineVisible ? 'translateY(0)' : 'translateY(24px)',
+                      transition:'all 0.6s ease ' + (i * 0.1) + 's',
+                      position:  'relative',
+                    }}>
+
+                      {/* Year + dot */}
+                      <div style={{
+                        display:        'flex',
+                        flexDirection:  'column',
+                        alignItems:     'flex-end',
+                        paddingRight:   24,
+                        position:       'relative',
+                      }}>
+                        {/* Dot on line */}
+                        <div style={{
+                          position:     'absolute',
+                          right:        -5,
+                          top:          6,
+                          width:        10,
+                          height:       10,
+                          borderRadius: '50%',
+                          background:   i === 0 ? 'var(--copper)' : 'var(--charcoal-4)',
+                          border:       '2px solid ' + (i === 0 ? 'var(--copper)' : 'rgba(184,115,51,0.25)'),
+                          transition:   'background 0.3s ease',
+                        }} />
+                        <div style={{
+                          fontFamily:  'var(--font-serif)',
+                          fontSize:    '1.3rem',
+                          fontWeight:  300,
+                          color:       i === TIMELINE.length - 1
+                            ? 'var(--copper-light)'
+                            : 'var(--pearl-ghost)',
+                          lineHeight:  1,
+                          marginTop:   0,
+                        }}>
+                          {item.year}
+                        </div>
+                      </div>
+
+                      {/* Content */}
+                      <div>
+                        <div style={{
+                          fontFamily:    'var(--font-wide)',
+                          fontSize:      '0.58rem',
+                          fontWeight:    600,
+                          letterSpacing: '0.2em',
+                          textTransform: 'uppercase',
+                          color:         i === TIMELINE.length - 1
+                            ? 'var(--copper)'
+                            : 'var(--pearl-ghost)',
+                          marginBottom:  10,
+                        }}>
+                          {item.title}
+                        </div>
+                        <p style={{
+                          fontFamily:  'var(--font-body)',
+                          fontSize:    '0.88rem',
+                          fontWeight:  300,
+                          color:       'var(--pearl-muted)',
+                          lineHeight:  1.8,
+                        }}>
+                          {item.desc}
+                        </p>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
           </div>
         </div>
       </section>
 
-      {/* ═══════════════════════════
+
+      {/* ══════════════════════════════
           VALUES
-      ═══════════════════════════ */}
+      ══════════════════════════════ */}
       <section className="section" ref={valuesRef} style={{
-        background: 'linear-gradient(180deg, transparent, rgba(15,34,16,0.15), transparent)',
+        borderTop:  'var(--border)',
+        background: 'var(--charcoal-2)',
       }}>
         <div className="container">
-          <div style={{ textAlign: 'center', marginBottom: 64 }}>
-            <div className="section-label" style={{ justifyContent: 'center' }}>
-              What Drives Us
-            </div>
-            <h2 style={{
-              fontFamily: 'var(--font-display)',
-              fontSize: 'clamp(2.5rem, 5vw, 4rem)',
-              letterSpacing: '0.04em',
+          <div style={{
+            display:        'flex',
+            alignItems:     'flex-end',
+            justifyContent: 'space-between',
+            marginBottom:   64,
+            gap:            40,
+            flexWrap:       'wrap',
+          }}>
+            <div style={{
+              opacity:    valuesVisible ? 1 : 0,
+              transform:  valuesVisible ? 'translateY(0)' : 'translateY(16px)',
+              transition: 'all 0.6s ease',
             }}>
-              OUR{' '}
-              <span style={{ color: 'var(--green-400)' }}>VALUES</span>
-            </h2>
+              <div className="eyebrow">What Drives Us</div>
+              <h2 style={{
+                fontFamily:  'var(--font-serif)',
+                fontSize:    'clamp(2.2rem, 4vw, 3.6rem)',
+                fontWeight:  300,
+                color:       'var(--pearl)',
+                lineHeight:  1.05,
+              }}>
+                Our{' '}
+                <span style={{ fontStyle: 'italic', color: 'var(--copper-light)' }}>
+                  Values
+                </span>
+              </h2>
+            </div>
           </div>
 
+          {/* Values as editorial list */}
           <div style={{
-            display: 'grid',
-            gridTemplateColumns: 'repeat(3,1fr)',
-            gap: 20,
-          }}
-            className="values-grid"
-          >
+            display:       'flex',
+            flexDirection: 'column',
+            gap:           0,
+          }}>
             {VALUES.map(function(val, i) {
               return (
-                <div key={val.title} className="card" style={{
-                  padding: '36px 32px', borderRadius: 8,
-                  opacity: valuesVisible ? 1 : 0,
-                  transform: valuesVisible ? 'translateY(0)' : 'translateY(40px)',
-                  transition: 'all 0.6s ease ' + (i * 0.08) + 's',
-                }}
+                <div
+                  key={val.title}
+                  style={{
+                    display:      'grid',
+                    gridTemplateColumns: '60px 240px 1fr',
+                    gap:          40,
+                    padding:      '36px 0',
+                    borderBottom: i < VALUES.length - 1 ? 'var(--border)' : 'none',
+                    alignItems:   'start',
+                    opacity:      valuesVisible ? 1 : 0,
+                    transform:    valuesVisible ? 'translateY(0)' : 'translateY(20px)',
+                    transition:   'all 0.5s ease ' + (i * 0.07) + 's',
+                    cursor:       'default',
+                  }}
+                  className="value-row"
                   onMouseEnter={function(e) {
-                    e.currentTarget.style.transform     = 'translateY(-6px)';
-                    e.currentTarget.style.borderColor   = 'rgba(46,204,55,0.3)';
-                    e.currentTarget.style.boxShadow     = '0 20px 40px rgba(0,0,0,0.3), 0 0 30px rgba(46,204,55,0.08)';
+                    e.currentTarget.style.background = 'rgba(184,115,51,0.02)';
                   }}
                   onMouseLeave={function(e) {
-                    e.currentTarget.style.transform   = 'translateY(0)';
-                    e.currentTarget.style.borderColor = 'rgba(46,204,55,0.12)';
-                    e.currentTarget.style.boxShadow   = 'none';
+                    e.currentTarget.style.background = 'transparent';
                   }}
                 >
-                  <div style={{ fontSize: '2.2rem', marginBottom: 16 }}>{val.icon}</div>
-                  <h3 style={{
-                    fontFamily: 'var(--font-heading)',
-                    fontSize: '0.88rem',
-                    color: 'var(--green-400)',
-                    letterSpacing: '0.08em',
-                    marginBottom: 12,
+                  <div style={{
+                    fontFamily:    'var(--font-mono)',
+                    fontSize:      '0.68rem',
+                    fontWeight:    300,
+                    color:         'var(--copper)',
+                    opacity:       0.6,
+                    paddingTop:    4,
+                  }}>
+                    {val.index}
+                  </div>
+                  <div style={{
+                    fontFamily:    'var(--font-serif)',
+                    fontSize:      '1.25rem',
+                    fontWeight:    400,
+                    color:         'var(--pearl)',
+                    lineHeight:    1.2,
+                    paddingTop:    2,
                   }}>
                     {val.title}
-                  </h3>
+                  </div>
                   <p style={{
-                    fontFamily: 'var(--font-body)',
-                    fontSize: '0.875rem',
-                    color: 'var(--text-muted)',
-                    lineHeight: 1.8,
+                    fontFamily:  'var(--font-body)',
+                    fontSize:    '0.88rem',
+                    fontWeight:  300,
+                    color:       'var(--pearl-muted)',
+                    lineHeight:  1.8,
                   }}>
                     {val.desc}
                   </p>
@@ -621,96 +811,115 @@ export default function About() {
         </div>
       </section>
 
-      {/* ═══════════════════════════
+
+      {/* ══════════════════════════════
           TEAM
-      ═══════════════════════════ */}
+      ══════════════════════════════ */}
       <section className="section" ref={teamRef}>
         <div className="container">
-          <div style={{ textAlign: 'center', marginBottom: 64 }}>
-            <div className="section-label" style={{ justifyContent: 'center' }}>
-              Core Committee
-            </div>
+          <div style={{ marginBottom: 56 }}>
+            <div className="eyebrow">Core Committee</div>
             <h2 style={{
-              fontFamily: 'var(--font-display)',
-              fontSize: 'clamp(2.5rem, 5vw, 4rem)',
-              letterSpacing: '0.04em',
+              fontFamily:  'var(--font-serif)',
+              fontSize:    'clamp(2.2rem, 4vw, 3.6rem)',
+              fontWeight:  300,
+              color:       'var(--pearl)',
+              lineHeight:  1.05,
             }}>
-              THE TEAM{' '}
-              <span style={{ color: 'var(--green-400)' }}>BEHIND IT</span>
+              The team{' '}
+              <span style={{ fontStyle: 'italic', color: 'var(--copper-light)' }}>
+                behind it all
+              </span>
             </h2>
           </div>
 
           <div style={{
-            display: 'grid',
-            gridTemplateColumns: 'repeat(4,1fr)',
-            gap: 16,
+            display:             'grid',
+            gridTemplateColumns: 'repeat(4, 1fr)',
+            gap:                 1,
+            background:          'rgba(255,255,255,0.04)',
           }}
             className="team-grid"
           >
             {TEAM.map(function(member, i) {
               return (
-                <div key={member.name} className="card" style={{
-                  padding: '28px 24px', borderRadius: 8,
-                  opacity: teamVisible ? 1 : 0,
-                  transform: teamVisible ? 'translateY(0)' : 'translateY(30px)',
-                  transition: 'all 0.5s ease ' + (i * 0.07) + 's',
-                  position: 'relative', overflow: 'hidden',
+                <div key={member.name} style={{
+                  padding:    '36px 28px',
+                  background: 'var(--charcoal-2)',
+                  position:   'relative',
+                  overflow:   'hidden',
+                  opacity:    teamVisible ? 1 : 0,
+                  transform:  teamVisible ? 'translateY(0)' : 'translateY(24px)',
+                  transition: 'all 0.5s ease ' + (i * 0.06) + 's',
+                  cursor:     'default',
                 }}
                   onMouseEnter={function(e) {
-                    e.currentTarget.style.borderColor = 'rgba(46,204,55,0.3)';
+                    e.currentTarget.style.background = 'var(--charcoal-3)';
                   }}
                   onMouseLeave={function(e) {
-                    e.currentTarget.style.borderColor = 'rgba(46,204,55,0.12)';
+                    e.currentTarget.style.background = 'var(--charcoal-2)';
                   }}
                 >
-                  {/* Avatar placeholder */}
+                  {/* Initial avatar */}
                   <div style={{
-                    width: 52, height: 52,
-                    borderRadius: '50%',
-                    background: 'linear-gradient(135deg, rgba(46,204,55,0.2), rgba(20,83,26,0.4))',
-                    border: '1px solid rgba(46,204,55,0.25)',
-                    display: 'flex', alignItems: 'center', justifyContent: 'center',
-                    fontFamily: 'var(--font-display)',
-                    fontSize: '1.2rem',
-                    color: 'var(--green-400)',
-                    marginBottom: 16,
-                    boxShadow: '0 0 16px rgba(46,204,55,0.1)',
+                    width:         44,
+                    height:        44,
+                    borderRadius:  '50%',
+                    background:    'var(--charcoal-4)',
+                    border:        'var(--border-copper)',
+                    display:       'flex',
+                    alignItems:    'center',
+                    justifyContent:'center',
+                    fontFamily:    'var(--font-serif)',
+                    fontSize:      '1.1rem',
+                    fontWeight:    300,
+                    color:         'var(--copper-light)',
+                    marginBottom:  20,
+                    flexShrink:    0,
                   }}>
                     {member.name.charAt(0)}
                   </div>
 
                   <div style={{
-                    fontFamily: 'var(--font-mono)',
-                    fontSize: '0.52rem',
-                    color: 'var(--green-600)',
-                    letterSpacing: '0.2em',
-                    marginBottom: 4,
+                    fontFamily:    'var(--font-wide)',
+                    fontSize:      '0.5rem',
+                    fontWeight:    600,
+                    letterSpacing: '0.22em',
                     textTransform: 'uppercase',
+                    color:         'var(--copper)',
+                    marginBottom:  6,
+                    opacity:       0.7,
                   }}>
                     {member.dept}
                   </div>
+
                   <div style={{
-                    fontFamily: 'var(--font-heading)',
-                    fontSize: '0.82rem',
-                    color: 'var(--text-primary)',
-                    letterSpacing: '0.04em',
+                    fontFamily:  'var(--font-serif)',
+                    fontSize:    '1rem',
+                    fontWeight:  400,
+                    color:       'var(--pearl)',
                     marginBottom: 4,
+                    lineHeight:  1.2,
                   }}>
                     {member.name}
                   </div>
+
                   <div style={{
-                    fontFamily: 'var(--font-body)',
-                    fontSize: '0.78rem',
-                    color: 'var(--text-muted)',
+                    fontFamily:  'var(--font-body)',
+                    fontSize:    '0.78rem',
+                    fontWeight:  300,
+                    color:       'var(--pearl-muted)',
                   }}>
                     {member.role}
                   </div>
 
-                  {/* Bottom accent */}
+                  {/* Bottom copper line */}
                   <div style={{
-                    position: 'absolute', bottom: 0, left: 0, right: 0,
-                    height: 2,
-                    background: 'linear-gradient(90deg, var(--green-800), transparent)',
+                    position:   'absolute',
+                    bottom: 0, left: 0, right: 0,
+                    height:     1,
+                    background: 'linear-gradient(90deg, var(--copper), transparent)',
+                    opacity:    0.15,
                   }} />
                 </div>
               );
@@ -719,90 +928,132 @@ export default function About() {
         </div>
       </section>
 
-      {/* ═══════════════════════════
-          CTA
-      ═══════════════════════════ */}
-      <section className="section-sm" ref={ctaRef}>
+
+      {/* ══════════════════════════════
+          CTA — JOIN + SPONSOR
+      ══════════════════════════════ */}
+      <section className="section-sm" ref={ctaRef} style={{
+        borderTop: 'var(--border)',
+      }}>
         <div className="container">
           <div style={{
-            display: 'grid',
+            display:             'grid',
             gridTemplateColumns: '1fr 1fr',
-            gap: 0,
-            border: 'var(--border)',
-            borderRadius: 12, overflow: 'hidden',
-            opacity: ctaVisible ? 1 : 0,
-            transform: ctaVisible ? 'translateY(0)' : 'translateY(30px)',
+            gap:                 1,
+            background:          'rgba(255,255,255,0.04)',
+            opacity:    ctaVisible ? 1 : 0,
+            transform:  ctaVisible ? 'translateY(0)' : 'translateY(24px)',
             transition: 'all 0.7s ease',
           }}
-            className="cta-grid"
+            className="cta-split"
           >
-            {/* Left */}
+
+            {/* Left — Join */}
             <div style={{
-              padding: '64px 56px',
-              background: 'rgba(10,26,10,0.5)',
-              borderRight: 'var(--border)',
+              padding:    '64px 56px',
+              background: 'var(--charcoal-2)',
+              position:   'relative',
+              overflow:   'hidden',
             }}>
-              <div className="section-label" style={{ marginBottom: 20 }}>
+              <div style={{
+                position:   'absolute',
+                top: 0, left: 0,
+                width:      100,
+                height:     100,
+                background: 'radial-gradient(circle at 0% 0%, rgba(184,115,51,0.06) 0%, transparent 70%)',
+                pointerEvents: 'none',
+              }} />
+
+              <div className="eyebrow" style={{ marginBottom: 20 }}>
                 Join EVOLVE
               </div>
               <h3 style={{
-                fontFamily: 'var(--font-display)',
-                fontSize: 'clamp(1.8rem, 3vw, 2.8rem)',
-                letterSpacing: '0.04em', marginBottom: 20,
+                fontFamily:  'var(--font-serif)',
+                fontSize:    'clamp(1.8rem, 3vw, 2.6rem)',
+                fontWeight:  300,
+                color:       'var(--pearl)',
+                lineHeight:  1.05,
+                marginBottom: 20,
               }}>
-                BE PART OF THE{' '}
-                <span style={{ color: 'var(--green-400)' }}>MOVEMENT</span>
+                Be part of the{' '}
+                <span style={{ fontStyle: 'italic', color: 'var(--copper-light)' }}>
+                  movement.
+                </span>
               </h3>
               <p style={{
-                fontFamily: 'var(--font-body)',
-                fontSize: '0.9rem', color: 'var(--text-muted)',
-                lineHeight: 1.8, marginBottom: 32,
+                fontFamily:  'var(--font-body)',
+                fontSize:    '0.88rem',
+                fontWeight:  300,
+                color:       'var(--pearl-muted)',
+                lineHeight:  1.8,
+                marginBottom: 36,
+                maxWidth:    400,
               }}>
-                We are always looking for passionate NIT Bhopal students who
-                want to build the electric future. Whether you are an engineer,
-                designer, storyteller, or organiser — there is a place for you
-                in EVOLVE.
+                We are always looking for passionate NIT Bhopal students
+                who want to build the electric future. Engineer, designer,
+                storyteller, or organiser — there is a place for you here.
               </p>
               <a href="mailto:evolve@nitb.in">
-                <button className="btn-glow">
+                <button className="btn-primary">
                   <span>Apply to Join EVOLVE</span>
-                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
                     <path d="M5 12h14M12 5l7 7-7 7"/>
                   </svg>
                 </button>
               </a>
             </div>
 
-            {/* Right */}
+            {/* Right — Sponsor */}
             <div style={{
-              padding: '64px 56px',
-              background: 'rgba(5,10,5,0.7)',
-              display: 'flex', flexDirection: 'column', justifyContent: 'center',
+              padding:    '64px 56px',
+              background: 'var(--charcoal-3)',
+              position:   'relative',
+              overflow:   'hidden',
             }}>
-              <div className="section-label" style={{ marginBottom: 20 }}>
+              <div style={{
+                position:   'absolute',
+                bottom: 0, right: 0,
+                width:      100,
+                height:     100,
+                background: 'radial-gradient(circle at 100% 100%, rgba(184,115,51,0.05) 0%, transparent 70%)',
+                pointerEvents: 'none',
+              }} />
+
+              <div className="eyebrow" style={{ marginBottom: 20 }}>
                 Partner With Us
               </div>
               <h3 style={{
-                fontFamily: 'var(--font-display)',
-                fontSize: 'clamp(1.8rem, 3vw, 2.8rem)',
-                letterSpacing: '0.04em', marginBottom: 20,
+                fontFamily:  'var(--font-serif)',
+                fontSize:    'clamp(1.8rem, 3vw, 2.6rem)',
+                fontWeight:  300,
+                color:       'var(--pearl)',
+                lineHeight:  1.05,
+                marginBottom: 20,
               }}>
-                SPONSOR{' '}
-                <span style={{ color: 'var(--green-400)' }}>VIDYUT 26</span>
+                Sponsor{' '}
+                <span style={{ fontStyle: 'italic', color: 'var(--copper-light)' }}>
+                  Vidyut 26.
+                </span>
               </h3>
               <p style={{
-                fontFamily: 'var(--font-body)',
-                fontSize: '0.9rem', color: 'var(--text-muted)',
-                lineHeight: 1.8, marginBottom: 32,
+                fontFamily:  'var(--font-body)',
+                fontSize:    '0.88rem',
+                fontWeight:  300,
+                color:       'var(--pearl-muted)',
+                lineHeight:  1.8,
+                marginBottom: 36,
+                maxWidth:    400,
               }}>
                 Put your brand in front of 5,000 of India's brightest
-                engineering students and EV professionals. Sponsorship
-                packages are available at Title, Gold, Silver, and
-                Community tiers.
+                engineering students and EV professionals. Title, Gold,
+                Silver, and Community tiers available.
               </p>
               <Link to="/vidyut-26">
-                <button className="btn-outline">
-                  <span>View Sponsorship Decks</span>
+                <button className="btn-ghost">
+                  <span>View Sponsorship Simulator</span>
+                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                    <path d="M5 12h14M12 5l7 7-7 7"/>
+                  </svg>
                 </button>
               </Link>
             </div>
@@ -811,19 +1062,21 @@ export default function About() {
       </section>
 
       <style>{`
-        @media (max-width: 1024px) {
-          .stats-bar { grid-template-columns: repeat(3,1fr) !important; }
-          .team-grid { grid-template-columns: repeat(2,1fr) !important; }
+        @media (max-width: 1100px) {
+          .timeline-layout { grid-template-columns: 1fr !important; gap: 48px !important; }
+          .value-row       { grid-template-columns: 60px 1fr !important; }
+          .stats-bar       { grid-template-columns: repeat(3,1fr) !important; }
+          .team-grid       { grid-template-columns: repeat(2,1fr) !important; }
         }
         @media (max-width: 900px) {
-          .story-grid   { grid-template-columns: 1fr !important; gap: 40px !important; }
-          .values-grid  { grid-template-columns: repeat(2,1fr) !important; }
-          .cta-grid     { grid-template-columns: 1fr !important; }
+          .story-grid       { grid-template-columns: 1fr !important; gap: 48px !important; }
+          .about-hero-bottom{ grid-template-columns: 1fr !important; gap: 40px !important; }
+          .cta-split        { grid-template-columns: 1fr !important; }
+          .value-row        { grid-template-columns: 1fr !important; gap: 12px !important; }
         }
         @media (max-width: 600px) {
-          .stats-bar    { grid-template-columns: repeat(2,1fr) !important; }
-          .values-grid  { grid-template-columns: 1fr !important; }
-          .team-grid    { grid-template-columns: repeat(2,1fr) !important; }
+          .stats-bar { grid-template-columns: repeat(2,1fr) !important; }
+          .team-grid { grid-template-columns: repeat(2,1fr) !important; }
         }
       `}</style>
     </div>

@@ -1,833 +1,1496 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { Link } from 'react-router-dom';
 
-function useReveal(threshold = 0.12) {
-  const ref = useRef(null);
-  const [visible, setVisible] = useState(false);
-  useEffect(() => {
-    const observer = new IntersectionObserver(([e]) => {
-      if (e.isIntersecting) { setVisible(true); observer.disconnect(); }
-    }, { threshold });
+function useReveal(threshold) {
+  var t = threshold || 0.1;
+  var ref = useRef(null);
+  var s = useState(false);
+  var visible = s[0];
+  var setVisible = s[1];
+  useEffect(function() {
+    var observer = new IntersectionObserver(function(entries) {
+      if (entries[0].isIntersecting) {
+        setVisible(true);
+        observer.disconnect();
+      }
+    }, { threshold: t });
     if (ref.current) observer.observe(ref.current);
-    return () => observer.disconnect();
+    return function() { observer.disconnect(); };
   }, []);
   return [ref, visible];
 }
 
-const EVENTS = [
+var EVENTS = [
   {
-    id: '01',
+    id:    '01',
+    tag:   'Exhibition',
     title: 'EV Grand Showcase',
-    category: 'EXHIBITION',
-    date: 'Mar 14, 2026',
-    time: '10:00 AM',
-    desc: 'The centrepiece of Vidyut 26 — a sprawling exhibition of production EVs, concept vehicles, and working prototypes from India\'s leading manufacturers and global brands. Walk the floor and witness firsthand how electric mobility has evolved from niche novelty to mainstream powerhouse. From two-wheelers to heavy electric trucks, every segment of the EV ecosystem is represented. Engineers and designers will be on hand for live walkthroughs, detailed tech breakdowns, and Q&A sessions.',
-    image: 'https://images.unsplash.com/photo-1593941707882-a5bba14938c7?w=800&q=80',
+    date:  'March 14',
+    time:  '10:00 AM',
+    seats: 'Open to All',
     prize: null,
-    spots: 'Open to All',
+    image: 'https://images.unsplash.com/photo-1593941707882-a5bba14938c7?w=900&q=85',
+    desc:  'The centrepiece of Vidyut 26 — a sprawling exhibition of production EVs, concept vehicles, and working prototypes from India\'s leading manufacturers and global brands. Walk the floor and witness firsthand how electric mobility has evolved from niche novelty to mainstream powerhouse. Engineers and designers will be on hand for live walkthroughs, detailed tech breakdowns, and direct Q&A sessions. Every vehicle on display represents a different vision of the electric future — and every visitor leaves with a new perspective on what mobility can be.',
   },
   {
-    id: '02',
+    id:    '02',
+    tag:   'Competition',
     title: 'Vidyut Speed Trials',
-    category: 'COMPETITION',
-    date: 'Mar 14, 2026',
-    time: '2:00 PM',
-    desc: 'Buckle up for the most adrenaline-charged event of the year. Student-built electric vehicles go head-to-head in timed acceleration runs across a specially designed track on the NIT Bhopal campus. Teams from universities across India compete in multiple categories — from lightweight two-wheelers to full-scale electric karts. Each run is a testament to months of engineering, sleepless nights, and sheer innovation. Witness peak torque and instant acceleration in its purest form.',
-    image: 'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=800&q=80',
+    date:  'March 14',
+    time:  '2:00 PM',
+    seats: '24 Teams',
     prize: '₹1,50,000',
-    spots: '24 Teams',
+    image: 'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=900&q=85',
+    desc:  'Student-built electric vehicles go head-to-head in timed acceleration runs across a purpose-designed track on the NIT Bhopal campus. Teams from universities across India compete in multiple categories — lightweight two-wheelers to full-scale electric karts. Each run is a testament to months of engineering, sleepless nights, and relentless iteration. Witness instant torque and zero-emission speed in its rawest, most honest form. The crowd favourite at every edition of Vidyut — and this year the track is longer and faster than ever before.',
   },
   {
-    id: '03',
+    id:    '03',
+    tag:   'Knowledge',
     title: 'Battery Tech Symposium',
-    category: 'KNOWLEDGE',
-    date: 'Mar 15, 2026',
-    time: '9:30 AM',
-    desc: 'The battery is the heart of every electric vehicle, and this symposium goes deep into its future. Researchers, battery scientists, and startup founders gather to present cutting-edge work on solid-state batteries, silicon-anode technology, ultra-fast charging, and second-life battery applications. Presentations are followed by open panel discussions, giving attendees a rare chance to engage directly with the scientists shaping tomorrow\'s energy storage. Whether you\'re a student, researcher, or industry professional — this session is unmissable.',
-    image: 'https://images.unsplash.com/photo-1606813907291-d86efa9b94db?w=800&q=80',
+    date:  'March 15',
+    time:  '9:30 AM',
+    seats: 'Open to All',
     prize: null,
-    spots: 'Open to All',
+    image: 'https://images.unsplash.com/photo-1606813907291-d86efa9b94db?w=900&q=85',
+    desc:  'The battery is the heart of every electric vehicle — and this symposium goes deep into its future. Researchers, battery scientists, and startup founders present cutting-edge work on solid-state batteries, silicon-anode technology, ultra-fast charging, and second-life battery applications. Presentations are followed by open panel discussions, giving attendees direct access to the scientists shaping tomorrow\'s energy storage. Whether you are a student, researcher, or industry professional — this is the session that changes how you see the EV transition.',
   },
   {
-    id: '04',
+    id:    '04',
+    tag:   'Challenge',
     title: 'EV Design Hackathon',
-    category: 'CHALLENGE',
-    date: 'Mar 15, 2026',
-    time: '8:00 AM',
-    desc: '48 hours. One challenge. Unlimited possibility. Teams of four dive into one of three problem tracks — EV charging infrastructure, battery management systems, or urban last-mile delivery solutions. Armed with components, cloud credits, and mentorship from industry veterans, participants design, prototype, and pitch their solutions to a panel of investors and engineers. This isn\'t just a hackathon — it\'s a launchpad. Past participants have gone on to found funded startups and win national innovation awards.',
-    image: 'https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?w=800&q=80',
+    date:  'March 15',
+    time:  '8:00 AM',
+    seats: '40 Teams',
     prize: '₹5,00,000',
-    spots: '40 Teams',
+    image: 'https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?w=900&q=85',
+    desc:  '48 hours. Three problem tracks. Unlimited ambition. Teams of four dive into EV charging infrastructure, battery management systems, or urban last-mile delivery. Armed with hardware components, cloud credits, and mentorship from industry veterans, participants design, prototype, and pitch to a panel of investors and engineers. This is not just a hackathon — it is a launchpad. Past Vidyut Hackathon winners have founded funded startups and won national innovation awards. This year\'s prize pool is the largest in Vidyut history.',
   },
   {
-    id: '05',
+    id:    '05',
+    tag:   'Summit',
     title: 'Green Future Summit',
-    category: 'SUMMIT',
-    date: 'Mar 15, 2026',
-    time: '3:00 PM',
-    desc: 'India has pledged 30% EV adoption by 2030. But how do we actually get there? The Green Future Summit brings together policymakers, urban planners, EV startup founders, and sustainability experts for an unflinching conversation about India\'s electric transition. Topics include charging infrastructure gaps, rural EV adoption, grid readiness for mass electrification, and the role of public policy in accelerating change. Expect debate, data, and a clear-eyed view of the road ahead.',
-    image: 'https://images.unsplash.com/photo-1473341304170-971dccb5ac1e?w=800&q=80',
+    date:  'March 15',
+    time:  '3:00 PM',
+    seats: 'Open to All',
     prize: null,
-    spots: 'Open to All',
+    image: 'https://images.unsplash.com/photo-1473341304170-971dccb5ac1e?w=900&q=85',
+    desc:  'India has pledged 30% EV adoption by 2030. The Green Future Summit brings together policymakers, urban planners, EV startup founders, and sustainability experts for an unflinching conversation about what that commitment actually requires. Topics include charging infrastructure gaps, rural EV adoption, grid readiness for mass electrification, and the role of public investment in accelerating change. Expect data, debate, and a clear-eyed view of the road ahead — with no comfortable assumptions left unchallenged.',
   },
   {
-    id: '06',
-    title: 'Smart Charging Workshop',
-    category: 'WORKSHOP',
-    date: 'Mar 16, 2026',
-    time: '11:00 AM',
-    desc: 'Charging infrastructure is the backbone of EV adoption — and it remains the biggest challenge. This hands-on workshop takes participants through the full stack of EV charging: from AC/DC charging fundamentals and connector standards to smart grid integration, demand response, and V2G (vehicle-to-grid) technology. Attendees get to configure a real-world charging station, simulate grid load scenarios, and explore business models for charging network deployment in India\'s tier-2 and tier-3 cities.',
-    image: 'https://images.unsplash.com/photo-1647427060118-4911c9821b82?w=800&q=80',
+    id:    '06',
+    tag:   'Workshop',
+    title: 'Smart Charging Lab',
+    date:  'March 16',
+    time:  '11:00 AM',
+    seats: '60 Seats',
     prize: null,
-    spots: '60 Seats',
+    image: 'https://images.unsplash.com/photo-1647427060118-4911c9821b82?w=900&q=85',
+    desc:  'A hands-on deep-dive into the full stack of EV charging — from AC/DC fundamentals and connector standards to smart grid integration, demand response, and vehicle-to-grid technology. Attendees configure a real charging station, simulate grid load scenarios, and explore business models for network deployment across India\'s tier-2 and tier-3 cities. Conducted by practising engineers from the EV charging industry. Limited to 60 participants to ensure every attendee gets hands-on time with the hardware.',
   },
 ];
 
-const TIMELINE = [
-  { day: 'Day 1', date: 'March 14', title: 'Ignition', events: ['Grand Opening Ceremony', 'EV Showcase Launch', 'Speed Trial Qualifiers', 'Networking Dinner'] },
-  { day: 'Day 2', date: 'March 15', title: 'Acceleration', events: ['Battery Tech Symposium', 'Hackathon Kickoff', 'Green Future Summit', 'Live Demos & Test Rides'] },
-  { day: 'Day 3', date: 'March 16', title: 'Podium', events: ['Smart Charging Workshop', 'Hackathon Finals & Pitch', 'Speed Trial Finals', 'Awards & Closing Gala'] },
+var TIMELINE = [
+  {
+    day:    'Day One',
+    date:   'March 14',
+    title:  'Ignition',
+    color:  'var(--copper)',
+    events: [
+      'Grand Opening Ceremony',
+      'EV Grand Showcase Launch',
+      'Speed Trial Qualifiers',
+      'Industry Networking Dinner',
+    ],
+  },
+  {
+    day:    'Day Two',
+    date:   'March 15',
+    title:  'Acceleration',
+    color:  'var(--pearl-dim)',
+    events: [
+      'Battery Tech Symposium',
+      'Hackathon — 48hr Kickoff',
+      'Green Future Summit',
+      'Live Demos and Test Rides',
+    ],
+  },
+  {
+    day:    'Day Three',
+    date:   'March 16',
+    title:  'Podium',
+    color:  'var(--sage)',
+    events: [
+      'Smart Charging Workshop',
+      'Hackathon Finals and Pitch',
+      'Speed Trial Finals',
+      'Awards and Closing Gala',
+    ],
+  },
 ];
 
-const SPONSORS = [
-  { tier: 'TITLE', name: 'PowerDrive India', color: 'var(--green-400)' },
-  { tier: 'GOLD',  name: 'VoltEdge Motors',  color: '#fbbf24' },
-  { tier: 'GOLD',  name: 'ChargePlus',        color: '#fbbf24' },
-  { tier: 'SILVER',name: 'GreenArc Tech',     color: '#94a3b8' },
-  { tier: 'SILVER',name: 'NitroCell Energy',  color: '#94a3b8' },
-  { tier: 'SILVER',name: 'EcoFlux Labs',      color: '#94a3b8' },
+// ── Sponsorship tiers ──
+// Each tier unlocks at a specific budget step.
+// Min: ₹50,000  Max: ₹2,00,000  Step: ₹50,000
+// Steps: 50k → 1L → 1.5L → 2L
+var SPONSOR_TIERS = [
+  {
+    name:       'Community',
+    threshold:  50000,
+    color:      '#8a8a9a',
+    colorLabel: 'Community',
+    perks: [
+      { text: 'Logo on official website',        included: true  },
+      { text: 'Social media mention (2 posts)',   included: true  },
+      { text: '2 complimentary delegate passes',  included: true  },
+      { text: 'Name in event booklet',            included: true  },
+      { text: 'Banner at venue entrance',         included: false },
+      { text: 'Exhibition booth space',           included: false },
+      { text: 'Speaking slot at main stage',      included: false },
+      { text: 'Logo on stage backdrop',           included: false },
+      { text: 'Dedicated press coverage',         included: false },
+      { text: 'VIP lounge access',                included: false },
+      { text: 'Event naming rights',              included: false },
+      { text: 'Year-round EVOLVE branding',       included: false },
+    ],
+  },
+  {
+    name:       'Silver',
+    threshold:  100000,
+    color:      '#b0b8c8',
+    colorLabel: 'Silver',
+    perks: [
+      { text: 'Logo on official website',         included: true  },
+      { text: 'Social media mention (2 posts)',    included: true  },
+      { text: '2 complimentary delegate passes',   included: true  },
+      { text: 'Name in event booklet',             included: true  },
+      { text: 'Banner at venue entrance',          included: true  },
+      { text: 'Exhibition booth — 4 sqm',          included: true  },
+      { text: 'Speaking slot at main stage',       included: false },
+      { text: 'Logo on stage backdrop',            included: false },
+      { text: 'Dedicated press coverage',          included: false },
+      { text: 'VIP lounge access',                 included: false },
+      { text: 'Event naming rights',               included: false },
+      { text: 'Year-round EVOLVE branding',        included: false },
+    ],
+  },
+  {
+    name:       'Gold',
+    threshold:  150000,
+    color:      '#d4af37',
+    colorLabel: 'Gold',
+    perks: [
+      { text: 'Logo on official website',          included: true  },
+      { text: 'Social media mention (5 posts)',    included: true  },
+      { text: '10 complimentary delegate passes',  included: true  },
+      { text: 'Full-page in event booklet',        included: true  },
+      { text: 'Banner at venue — premium spots',   included: true  },
+      { text: 'Exhibition booth — 12 sqm',         included: true  },
+      { text: 'Speaking slot — 20 minutes',        included: true  },
+      { text: 'Logo on stage backdrop',            included: true  },
+      { text: 'Dedicated press coverage',          included: false },
+      { text: 'VIP lounge access',                 included: false },
+      { text: 'Event naming rights',               included: false },
+      { text: 'Year-round EVOLVE branding',        included: false },
+    ],
+  },
+  {
+    name:       'Title',
+    threshold:  200000,
+    color:      '#B87333',
+    colorLabel: 'Title',
+    perks: [
+      { text: 'Logo on official website',          included: true  },
+      { text: 'Social media campaign — full run',  included: true  },
+      { text: '30 complimentary delegate passes',  included: true  },
+      { text: 'Full-page + back cover booklet',    included: true  },
+      { text: 'Banner at all venue zones',         included: true  },
+      { text: 'Exhibition booth — 30 sqm premium', included: true  },
+      { text: 'Keynote speaking slot',             included: true  },
+      { text: 'Prominent logo on stage backdrop',  included: true  },
+      { text: 'Dedicated press coverage',          included: true  },
+      { text: 'Exclusive VIP lounge access',       included: true  },
+      { text: 'Event naming rights',               included: true  },
+      { text: 'Year-round EVOLVE branding',        included: true  },
+    ],
+  },
 ];
+
+function formatBudget(val) {
+  if (val >= 100000) {
+    var l = val / 100000;
+    return '\u20B9' + (l === Math.floor(l) ? l : l.toFixed(1)) + 'L';
+  }
+  return '\u20B9' + (val / 1000) + 'K';
+}
+
+function CheckIcon(props) {
+  var color = props.color || 'var(--copper)';
+  return (
+    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2.5" strokeLinecap="round">
+      <polyline points="20 6 9 17 4 12"/>
+    </svg>
+  );
+}
+
+function CrossIcon() {
+  return (
+    <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.12)" strokeWidth="2" strokeLinecap="round">
+      <line x1="18" y1="6" x2="6" y2="18"/>
+      <line x1="6" y1="6" x2="18" y2="18"/>
+    </svg>
+  );
+}
+
+function SponsorSimulator() {
+  // Steps: 50000, 100000, 150000, 200000
+  var STEPS = [50000, 100000, 150000, 200000];
+  var MIN   = 50000;
+  var MAX   = 200000;
+
+  var budgetState = useState(50000);
+  var budget      = budgetState[0];
+  var setBudget   = budgetState[1];
+
+  // Find which tier is active based on budget
+  var activeTierIndex = 0;
+  for (var i = 0; i < SPONSOR_TIERS.length; i++) {
+    if (budget >= SPONSOR_TIERS[i].threshold) {
+      activeTierIndex = i;
+    }
+  }
+  var activeTier = SPONSOR_TIERS[activeTierIndex];
+
+  // Slider fill %
+  var fillPct = ((budget - MIN) / (MAX - MIN)) * 100;
+
+  return (
+    <div style={{
+      background: 'var(--charcoal-2)',
+      border:     'var(--border)',
+      position:   'relative',
+      overflow:   'hidden',
+    }}>
+
+      {/* Top copper line */}
+      <div style={{
+        position:   'absolute',
+        top: 0, left: '12%', right: '12%',
+        height:     1,
+        background: 'linear-gradient(90deg, transparent, var(--copper), transparent)',
+        opacity:    0.4,
+      }} />
+
+      {/* ── Header ── */}
+      <div style={{
+        padding:      '52px 56px 40px',
+        borderBottom: 'var(--border)',
+      }}>
+        <div className="eyebrow" style={{ marginBottom: 14 }}>
+          Sponsorship Simulator
+        </div>
+        <div style={{
+          display:        'flex',
+          alignItems:     'flex-end',
+          justifyContent: 'space-between',
+          flexWrap:       'wrap',
+          gap:            20,
+          marginBottom:   10,
+        }}>
+          <h3 style={{
+            fontFamily:  'var(--font-serif)',
+            fontSize:    'clamp(1.8rem, 3vw, 2.6rem)',
+            fontWeight:  300,
+            color:       'var(--pearl)',
+            lineHeight:  1.1,
+          }}>
+            See exactly what your{' '}
+            <span style={{ fontStyle: 'italic', color: 'var(--copper-light)' }}>
+              investment unlocks
+            </span>
+          </h3>
+          <p style={{
+            fontFamily:  'var(--font-body)',
+            fontSize:    '0.85rem',
+            fontWeight:  300,
+            color:       'var(--pearl-muted)',
+            lineHeight:  1.75,
+            maxWidth:    380,
+          }}>
+            Move the slider to select your budget.
+            Each step unlocks a new sponsorship tier
+            with additional branding and visibility benefits.
+          </p>
+        </div>
+      </div>
+
+      {/* ── Slider section ── */}
+      <div style={{ padding: '44px 56px', borderBottom: 'var(--border)' }}>
+
+        {/* Budget display + tier badge */}
+        <div style={{
+          display:        'flex',
+          alignItems:     'center',
+          justifyContent: 'space-between',
+          marginBottom:   32,
+          flexWrap:       'wrap',
+          gap:            16,
+        }}>
+          <div style={{ display: 'flex', alignItems: 'baseline', gap: 16 }}>
+            <div style={{
+              fontFamily:  'var(--font-serif)',
+              fontSize:    'clamp(3rem, 6vw, 5rem)',
+              fontWeight:  300,
+              lineHeight:  1,
+              color:       activeTier.color,
+              transition:  'color 0.4s ease',
+            }}>
+              {formatBudget(budget)}
+            </div>
+            <div style={{
+              fontFamily:  'var(--font-wide)',
+              fontSize:    '0.6rem',
+              fontWeight:  600,
+              letterSpacing: '0.15em',
+              color:       'var(--pearl-muted)',
+              textTransform: 'uppercase',
+            }}>
+              per annum
+            </div>
+          </div>
+
+          {/* Active tier pill */}
+          <div style={{
+            display:       'flex',
+            alignItems:    'center',
+            gap:           10,
+            padding:       '10px 20px',
+            border:        '1px solid ' + activeTier.color,
+            background:    'transparent',
+            transition:    'border-color 0.4s ease',
+          }}>
+            <div style={{
+              width:      8,
+              height:     8,
+              borderRadius: '50%',
+              background: activeTier.color,
+              transition: 'background 0.4s ease',
+            }} />
+            <div style={{
+              fontFamily:    'var(--font-wide)',
+              fontSize:      '0.62rem',
+              fontWeight:    700,
+              letterSpacing: '0.2em',
+              textTransform: 'uppercase',
+              color:         activeTier.color,
+              transition:    'color 0.4s ease',
+            }}>
+              {activeTier.name} Sponsor
+            </div>
+          </div>
+        </div>
+
+        {/* Slider */}
+        <div style={{ marginBottom: 20, position: 'relative' }}>
+          <input
+            type="range"
+            min={MIN}
+            max={MAX}
+            step={50000}
+            value={budget}
+            onChange={function(e) { setBudget(Number(e.target.value)); }}
+            style={{
+              width:            '100%',
+              appearance:       'none',
+              WebkitAppearance: 'none',
+              height:           2,
+              background:       'linear-gradient(90deg, ' + activeTier.color + ' ' + fillPct + '%, rgba(255,255,255,0.08) ' + fillPct + '%)',
+              outline:          'none',
+              cursor:           'none',
+              transition:       'background 0.3s ease',
+            }}
+          />
+        </div>
+
+        {/* Step markers */}
+        <div style={{
+          display:        'flex',
+          justifyContent: 'space-between',
+          position:       'relative',
+        }}>
+          {STEPS.map(function(step, i) {
+            var isActive  = budget >= step;
+            var isCurrent = budget === step;
+            return (
+              <div
+                key={step}
+                onClick={function() { setBudget(step); }}
+                style={{
+                  display:       'flex',
+                  flexDirection: 'column',
+                  alignItems:    i === 0 ? 'flex-start' : i === STEPS.length - 1 ? 'flex-end' : 'center',
+                  cursor:        'none',
+                  gap:           6,
+                }}
+              >
+                {/* Tick mark */}
+                <div style={{
+                  width:      1,
+                  height:     8,
+                  background: isActive ? SPONSOR_TIERS[i].color : 'rgba(255,255,255,0.12)',
+                  transition: 'background 0.3s ease',
+                  alignSelf:  i === 0 ? 'flex-start' : i === STEPS.length - 1 ? 'flex-end' : 'center',
+                }} />
+
+                {/* Label */}
+                <div style={{
+                  fontFamily:    'var(--font-wide)',
+                  fontSize:      '0.52rem',
+                  fontWeight:    isCurrent ? 700 : 600,
+                  letterSpacing: '0.18em',
+                  textTransform: 'uppercase',
+                  color:         isCurrent
+                    ? SPONSOR_TIERS[i].color
+                    : isActive
+                      ? 'var(--pearl-muted)'
+                      : 'var(--pearl-ghost)',
+                  transition:    'color 0.3s ease',
+                }}>
+                  {SPONSOR_TIERS[i].name}
+                </div>
+                <div style={{
+                  fontFamily:  'var(--font-mono)',
+                  fontSize:    '0.5rem',
+                  fontWeight:  300,
+                  color:       isCurrent ? SPONSOR_TIERS[i].color : 'var(--pearl-ghost)',
+                  transition:  'color 0.3s ease',
+                  opacity:     0.8,
+                }}>
+                  {formatBudget(step)}
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      </div>
+
+      {/* ── Perks comparison table ── */}
+      <div style={{ padding: '0 56px' }}>
+
+        {/* Table header */}
+        <div style={{
+          display:             'grid',
+          gridTemplateColumns: '1fr repeat(4, 100px)',
+          gap:                 0,
+          borderBottom:        'var(--border)',
+          padding:             '20px 0',
+        }}
+          className="perks-header"
+        >
+          <div style={{
+            fontFamily:    'var(--font-wide)',
+            fontSize:      '0.52rem',
+            fontWeight:    600,
+            letterSpacing: '0.2em',
+            textTransform: 'uppercase',
+            color:         'var(--pearl-ghost)',
+          }}>
+            What You Get
+          </div>
+
+          {SPONSOR_TIERS.map(function(tier, i) {
+            var isActive = activeTierIndex >= i;
+            return (
+              <div key={tier.name} style={{
+                textAlign:     'center',
+                padding:       '0 8px',
+                borderLeft:    'var(--border)',
+                transition:    'background 0.4s ease',
+                background:    i === activeTierIndex
+                  ? 'rgba(255,255,255,0.02)'
+                  : 'transparent',
+              }}>
+                <div style={{
+                  fontFamily:    'var(--font-wide)',
+                  fontSize:      '0.52rem',
+                  fontWeight:    700,
+                  letterSpacing: '0.18em',
+                  textTransform: 'uppercase',
+                  color:         isActive ? tier.color : 'var(--pearl-ghost)',
+                  transition:    'color 0.4s ease',
+                }}>
+                  {tier.name}
+                </div>
+              </div>
+            );
+          })}
+        </div>
+
+        {/* Perk rows */}
+        {SPONSOR_TIERS[0].perks.map(function(perk, perkIdx) {
+          return (
+            <div key={perkIdx} style={{
+              display:          'grid',
+              gridTemplateColumns: '1fr repeat(4, 100px)',
+              gap:              0,
+              borderBottom:     perkIdx < SPONSOR_TIERS[0].perks.length - 1
+                ? 'var(--border)'
+                : 'none',
+              padding:          '14px 0',
+              transition:       'background 0.2s ease',
+            }}
+              className="perk-row"
+              onMouseEnter={function(e) {
+                e.currentTarget.style.background = 'rgba(255,255,255,0.015)';
+              }}
+              onMouseLeave={function(e) {
+                e.currentTarget.style.background = 'transparent';
+              }}
+            >
+              {/* Perk label */}
+              <div style={{
+                fontFamily:  'var(--font-body)',
+                fontSize:    '0.85rem',
+                fontWeight:  300,
+                color:       'var(--pearl-muted)',
+                lineHeight:  1.4,
+                paddingRight: 16,
+                display:     'flex',
+                alignItems:  'center',
+              }}>
+                {perk.text}
+              </div>
+
+              {/* Tier columns */}
+              {SPONSOR_TIERS.map(function(tier, tierIdx) {
+                var tierHasPerk  = tier.perks[perkIdx].included;
+                var tierUnlocked = activeTierIndex >= tierIdx;
+                var isHighlight  = tierIdx === activeTierIndex;
+
+                return (
+                  <div key={tier.name} style={{
+                    display:        'flex',
+                    alignItems:     'center',
+                    justifyContent: 'center',
+                    borderLeft:     'var(--border)',
+                    background:     isHighlight
+                      ? 'rgba(255,255,255,0.02)'
+                      : 'transparent',
+                    transition:     'background 0.4s ease',
+                  }}>
+                    {tierHasPerk ? (
+                      <div style={{
+                        opacity:    tierUnlocked ? 1 : 0.25,
+                        transition: 'opacity 0.4s ease',
+                      }}>
+                        <CheckIcon color={tierUnlocked ? tier.color : 'rgba(255,255,255,0.2)'} />
+                      </div>
+                    ) : (
+                      <div style={{ opacity: 0.4 }}>
+                        <CrossIcon />
+                      </div>
+                    )}
+                  </div>
+                );
+              })}
+            </div>
+          );
+        })}
+      </div>
+
+      {/* ── Unlocked summary bar ── */}
+      <div style={{
+        margin:     '0 56px',
+        padding:    '24px 0',
+        borderTop:  'var(--border)',
+        display:    'flex',
+        alignItems: 'center',
+        gap:        16,
+        flexWrap:   'wrap',
+      }}>
+        <div style={{
+          fontFamily:  'var(--font-serif)',
+          fontSize:    '1rem',
+          fontStyle:   'italic',
+          fontWeight:  300,
+          color:       'var(--pearl-muted)',
+        }}>
+          At {formatBudget(budget)} you unlock
+        </div>
+        <div style={{
+          fontFamily:    'var(--font-wide)',
+          fontSize:      '0.62rem',
+          fontWeight:    700,
+          letterSpacing: '0.15em',
+          textTransform: 'uppercase',
+          color:         activeTier.color,
+          transition:    'color 0.4s ease',
+        }}>
+          {activeTier.perks.filter(function(p) { return p.included; }).length} benefits
+        </div>
+        <div style={{
+          fontFamily:  'var(--font-serif)',
+          fontSize:    '1rem',
+          fontStyle:   'italic',
+          fontWeight:  300,
+          color:       'var(--pearl-muted)',
+        }}>
+          as a {activeTier.name} Sponsor.
+        </div>
+      </div>
+
+      {/* ── CTA ── */}
+      <div style={{
+        padding:        '32px 56px 52px',
+        display:        'flex',
+        alignItems:     'center',
+        justifyContent: 'space-between',
+        flexWrap:       'wrap',
+        gap:            24,
+        borderTop:      'var(--border)',
+      }}>
+        <div>
+          <div style={{
+            fontFamily:  'var(--font-serif)',
+            fontSize:    '1.15rem',
+            fontWeight:  300,
+            fontStyle:   'italic',
+            color:       'var(--pearl)',
+            marginBottom: 6,
+          }}>
+            Ready to partner with EVOLVE?
+          </div>
+          <div style={{
+            fontFamily:  'var(--font-body)',
+            fontSize:    '0.82rem',
+            fontWeight:  300,
+            color:       'var(--pearl-muted)',
+          }}>
+            Our team will send a full sponsorship deck within 24 hours of enquiry.
+          </div>
+        </div>
+        <a href={'mailto:evolve@nitb.in?subject=Sponsorship Enquiry — ' + activeTier.name + ' Tier — Vidyut 26'}>
+          <button className="btn-primary">
+            <span>Request {activeTier.name} Tier Deck</span>
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+              <path d="M5 12h14M12 5l7 7-7 7"/>
+            </svg>
+          </button>
+        </a>
+      </div>
+
+      <style>{`
+        input[type='range']::-webkit-slider-thumb {
+          -webkit-appearance: none;
+          width:        20px;
+          height:       20px;
+          border-radius: 50%;
+          background:   var(--copper);
+          border:       3px solid var(--charcoal-2);
+          cursor:       none;
+          box-shadow:   0 0 0 1px rgba(184,115,51,0.4);
+          transition:   box-shadow 0.3s ease, background 0.3s ease;
+        }
+        input[type='range']::-webkit-slider-thumb:hover {
+          box-shadow: 0 0 0 4px rgba(184,115,51,0.15);
+        }
+        input[type='range']::-moz-range-thumb {
+          width:        20px;
+          height:       20px;
+          border-radius: 50%;
+          background:   var(--copper);
+          border:       3px solid var(--charcoal-2);
+          cursor:       none;
+        }
+        input[type='range']:focus {
+          outline: none;
+        }
+        @media (max-width: 900px) {
+          .perks-header { grid-template-columns: 1fr repeat(4, 72px) !important; }
+          .perk-row     { grid-template-columns: 1fr repeat(4, 72px) !important; }
+        }
+        @media (max-width: 640px) {
+          .perks-header { grid-template-columns: 1fr repeat(4, 52px) !important; }
+          .perk-row     { grid-template-columns: 1fr repeat(4, 52px) !important; }
+        }
+      `}</style>
+    </div>
+  );
+}
 
 export default function Vidyut26() {
-  const [heroRef,     heroVisible]     = useReveal(0.1);
-  const [aboutRef,    aboutVisible]    = useReveal();
-  const [eventsRef,   eventsVisible]   = useReveal();
-  const [timelineRef, timelineVisible] = useReveal();
-  const [sponsorRef,  sponsorVisible]  = useReveal();
-  const [registerRef, registerVisible] = useReveal();
-  const [activeEvent, setActiveEvent]  = useState(0);
-  const [formData, setFormData]        = useState({ name:'', email:'', college:'', event:'' });
-  const [submitted, setSubmitted]      = useState(false);
+  var heroState      = useState(false);
+  var heroVisible    = heroState[0];
+  var setHeroVisible = heroState[1];
 
-  const handleSubmit = (e) => {
+  var activeEventState = useState(0);
+  var activeEvent      = activeEventState[0];
+  var setActiveEvent   = activeEventState[1];
+
+  var formState   = useState({ name: '', email: '', college: '', event: '' });
+  var formData    = formState[0];
+  var setFormData = formState[1];
+
+  var subState   = useState(false);
+  var submitted  = subState[0];
+  var setSubmitted = subState[1];
+
+  var r1 = useReveal(0.08);
+  var eventsRef     = r1[0];
+  var eventsVisible = r1[1];
+
+  var r2 = useReveal();
+  var timelineRef     = r2[0];
+  var timelineVisible = r2[1];
+
+  var r3 = useReveal(0.04);
+  var simRef     = r3[0];
+  var simVisible = r3[1];
+
+  var r4 = useReveal();
+  var registerRef     = r4[0];
+  var registerVisible = r4[1];
+
+  useEffect(function() {
+    var t = setTimeout(function() { setHeroVisible(true); }, 120);
+    return function() { clearTimeout(t); };
+  }, []);
+
+  function handleSubmit(e) {
     e.preventDefault();
     if (formData.name && formData.email) setSubmitted(true);
-  };
+  }
+
+  function updateForm(key, val) {
+    setFormData(function(prev) {
+      var next = {};
+      Object.keys(prev).forEach(function(k) { next[k] = prev[k]; });
+      next[key] = val;
+      return next;
+    });
+  }
 
   return (
     <div style={{ overflowX: 'hidden' }}>
 
-      {/* ════════════════════════════
+      {/* ══════════════════════════════
           HERO
-      ════════════════════════════ */}
+      ══════════════════════════════ */}
       <section style={{
-        minHeight: '100vh',
-        display: 'flex', alignItems: 'center',
-        position: 'relative', overflow: 'hidden',
-        paddingTop: 100,
+        minHeight:     '100vh',
+        display:       'flex',
+        alignItems:    'center',
+        position:      'relative',
+        overflow:      'hidden',
+        paddingTop:    100,
+        paddingBottom: 80,
       }}>
-        {/* Hero BG image */}
         <div style={{
-          position: 'absolute', inset: 0,
-          backgroundImage: 'url(https://images.unsplash.com/photo-1593941707882-a5bba14938c7?w=1600&q=80)',
-          backgroundSize: 'cover', backgroundPosition: 'center',
-          filter: 'brightness(0.12) saturate(0.4)',
+          position:           'absolute',
+          inset:              0,
+          backgroundImage:    'url(https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=1600&q=90)',
+          backgroundSize:     'cover',
+          backgroundPosition: 'center',
+          filter:             'brightness(0.18) contrast(1.2) saturate(0.3)',
         }} />
         <div style={{
-          position: 'absolute', inset: 0,
-          background: 'linear-gradient(135deg, rgba(5,10,5,0.97) 40%, rgba(20,83,26,0.4) 100%)',
+          position:   'absolute',
+          inset:      0,
+          background: 'linear-gradient(135deg, rgba(10,10,11,0.97) 45%, rgba(10,10,11,0.6) 100%)',
         }} />
-
-        {/* Scanline overlay */}
         <div style={{
-          position: 'absolute', inset: 0,
-          backgroundImage: 'repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,0,0,0.08) 2px, rgba(0,0,0,0.08) 4px)',
-          pointerEvents: 'none',
+          position:   'absolute',
+          bottom: 0, left: 0, right: 0,
+          height:     '40%',
+          background: 'linear-gradient(0deg, var(--charcoal) 0%, transparent 100%)',
         }} />
 
         <div className="container" style={{ position: 'relative', zIndex: 2 }}>
-          <div ref={heroRef}>
-            {/* Label */}
+          <div style={{ maxWidth: 680 }}>
+
             <div style={{
-              opacity: heroVisible ? 1 : 0,
-              transform: heroVisible ? 'translateY(0)' : 'translateY(20px)',
+              opacity:    heroVisible ? 1 : 0,
+              transform:  heroVisible ? 'translateY(0)' : 'translateY(16px)',
               transition: 'all 0.6s ease 0.1s',
             }}>
-              <span className="badge" style={{ marginBottom: 32, display: 'inline-flex' }}>
-                Annual EV Conclave — NIT Bhopal
-              </span>
+              <div className="badge" style={{ marginBottom: 36, display: 'inline-flex' }}>
+                26th Annual EV Conclave {'\u00B7'} NIT Bhopal
+              </div>
             </div>
 
-            {/* Title */}
             <div style={{
-              opacity: heroVisible ? 1 : 0,
-              transform: heroVisible ? 'translateY(0)' : 'translateY(30px)',
-              transition: 'all 0.7s ease 0.2s',
+              opacity:    heroVisible ? 1 : 0,
+              transform:  heroVisible ? 'translateY(0)' : 'translateY(24px)',
+              transition: 'all 0.8s ease 0.2s',
             }}>
-              <h1 style={{
-                fontFamily: 'var(--font-display)',
-                fontSize: 'clamp(5rem, 14vw, 13rem)',
-                lineHeight: 0.88,
-                letterSpacing: '0.02em',
-                marginBottom: 0,
+              <div style={{
+                fontFamily:    'var(--font-wide)',
+                fontSize:      '0.62rem',
+                fontWeight:    600,
+                letterSpacing: '0.4em',
+                color:         'var(--copper)',
+                textTransform: 'uppercase',
+                marginBottom:  16,
               }}>
-                <span style={{ display: 'block', color: 'var(--text-muted)', fontSize: '35%', letterSpacing: '0.3em', fontFamily: 'var(--font-mono)', marginBottom: 12 }}>
-                  EVOLVE PRESENTS
-                </span>
-                <span style={{ display: 'block', color: 'var(--green-400)', textShadow: '0 0 60px rgba(46,204,55,0.4)' }}>
-                  VIDYUT
-                </span>
-                <span style={{ display: 'block', color: 'var(--text-primary)', WebkitTextStroke: '1px rgba(46,204,55,0.2)' }}>
-                  26
-                </span>
+                Evolve Presents
+              </div>
+              <h1 style={{
+                fontFamily:    'var(--font-serif)',
+                fontSize:      'clamp(5rem, 13vw, 11rem)',
+                fontWeight:    300,
+                lineHeight:    0.9,
+                letterSpacing: '-0.01em',
+              }}>
+                <span style={{ display: 'block', color: 'var(--pearl)' }}>Vidyut</span>
+                <span style={{ display: 'block', fontStyle: 'italic', color: 'var(--copper-light)' }}>26</span>
               </h1>
             </div>
 
-            {/* Tagline */}
             <div style={{
-              opacity: heroVisible ? 1 : 0,
-              transform: heroVisible ? 'translateY(0)' : 'translateY(20px)',
-              transition: 'all 0.7s ease 0.38s',
-              marginTop: 32, maxWidth: 600,
+              opacity:    heroVisible ? 1 : 0,
+              transform:  heroVisible ? 'translateY(0)' : 'translateY(16px)',
+              transition: 'all 0.8s ease 0.38s',
+              marginTop:  32,
             }}>
               <p style={{
-                fontFamily: 'var(--font-body)',
-                fontSize: '1.1rem',
-                color: 'var(--text-secondary)',
-                lineHeight: 1.75,
+                fontFamily:   'var(--font-body)',
+                fontSize:     '1.05rem',
+                fontWeight:   300,
+                color:        'var(--pearl-muted)',
+                lineHeight:   1.8,
+                maxWidth:     520,
+                marginBottom: 44,
               }}>
                 Three days. One campus. A thousand sparks of innovation.
                 India's most electrifying student-led EV conclave returns
-                with bigger competitions, deeper knowledge sessions, and
-                the boldest showcase of electric mobility yet.
+                with its boldest programme, largest prize pool, and most
+                ambitious vision yet.
               </p>
-            </div>
-
-            {/* Date / Venue pills */}
-            <div style={{
-              display: 'flex', gap: 12, flexWrap: 'wrap', marginTop: 36,
-              opacity: heroVisible ? 1 : 0,
-              transition: 'all 0.7s ease 0.5s',
-            }}>
-              {[
-                { icon: '📅', text: 'March 14 – 16, 2026' },
-                { icon: '📍', text: 'NIT Bhopal, Madhya Pradesh' },
-                { icon: '⚡', text: 'Vidyut 26th Edition' },
-              ].map(pill => (
-                <div key={pill.text} style={{
-                  display: 'flex', alignItems: 'center', gap: 8,
-                  padding: '10px 20px',
-                  background: 'rgba(46,204,55,0.06)',
-                  border: 'var(--border)',
-                  borderRadius: 100,
-                  fontFamily: 'var(--font-body)',
-                  fontSize: '0.85rem',
-                  color: 'var(--text-secondary)',
-                }}>
-                  <span>{pill.icon}</span>
-                  <span>{pill.text}</span>
-                </div>
-              ))}
-            </div>
-
-            {/* CTA */}
-            <div style={{
-              marginTop: 48,
-              opacity: heroVisible ? 1 : 0,
-              transition: 'all 0.7s ease 0.6s',
-            }}>
-              <a href="#register">
-                <button className="btn-glow" style={{ padding: '16px 48px', fontSize: '0.8rem' }}>
-                  <span>Register Now — Free Entry</span>
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
-                    <path d="M5 12h14M12 5l7 7-7 7"/>
-                  </svg>
-                </button>
-              </a>
-            </div>
-          </div>
-        </div>
-
-        {/* Scroll cue */}
-        <div style={{
-          position: 'absolute', bottom: 40, left: '50%',
-          transform: 'translateX(-50%)',
-          display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 8,
-          opacity: 0.5,
-        }}>
-          <div style={{ fontFamily: 'var(--font-mono)', fontSize: '0.55rem', color: 'var(--text-muted)', letterSpacing: '0.3em' }}>SCROLL</div>
-          <div style={{ width: 1, height: 50, background: 'linear-gradient(180deg, rgba(46,204,55,0.6), transparent)', animation: 'float 2s ease-in-out infinite' }} />
-        </div>
-      </section>
-
-      {/* ════════════════════════════
-          ABOUT EV DAY
-      ════════════════════════════ */}
-      <section className="section" ref={aboutRef}>
-        <div className="container">
-          <div style={{
-            display: 'grid',
-            gridTemplateColumns: '1fr 1fr',
-            gap: 80, alignItems: 'center',
-          }} className="about-grid">
-
-            {/* Image side */}
-            <div style={{
-              position: 'relative',
-              opacity: aboutVisible ? 1 : 0,
-              transform: aboutVisible ? 'translateX(0)' : 'translateX(-40px)',
-              transition: 'all 0.8s ease',
-            }}>
-              <div style={{
-                position: 'relative', borderRadius: 8, overflow: 'hidden',
-                border: 'var(--border)',
-              }}>
-                <img
-                  src="https://images.unsplash.com/photo-1617788138017-80ad40651399?w=800&q=80"
-                  alt="EV Day"
-                  style={{ width: '100%', height: 420, objectFit: 'cover', display: 'block', filter: 'brightness(0.75) saturate(0.8) hue-rotate(60deg)' }}
-                />
-                <div style={{
-                  position: 'absolute', inset: 0,
-                  background: 'linear-gradient(135deg, rgba(5,10,5,0.5) 0%, transparent 60%)',
-                }} />
-              </div>
-
-              {/* Floating stat card */}
-              <div style={{
-                position: 'absolute', bottom: -24, right: -24,
-                padding: '20px 28px',
-                background: 'rgba(10,26,10,0.95)',
-                border: 'var(--border-bright)',
-                borderRadius: 8,
-                backdropFilter: 'blur(16px)',
-              }}>
-                <div style={{ fontFamily: 'var(--font-display)', fontSize: '2.8rem', color: 'var(--green-400)', lineHeight: 1, textShadow: '0 0 20px rgba(46,204,55,0.4)' }}>26</div>
-                <div style={{ fontFamily: 'var(--font-mono)', fontSize: '0.6rem', color: 'var(--text-muted)', letterSpacing: '0.2em', marginTop: 4 }}>YEARS OF LEGACY</div>
-              </div>
-
-              {/* Corner bracket */}
-              <div style={{ position: 'absolute', top: -10, left: -10, width: 32, height: 32, borderTop: '2px solid var(--green-600)', borderLeft: '2px solid var(--green-600)' }} />
-            </div>
-
-            {/* Text side */}
-            <div style={{
-              opacity: aboutVisible ? 1 : 0,
-              transform: aboutVisible ? 'translateX(0)' : 'translateX(40px)',
-              transition: 'all 0.8s ease 0.15s',
-            }}>
-              <div className="section-label">About EV Day</div>
-              <h2 style={{
-                fontFamily: 'var(--font-display)',
-                fontSize: 'clamp(2.2rem, 4vw, 3.8rem)',
-                color: 'var(--text-primary)',
-                letterSpacing: '0.04em',
-                marginBottom: 28,
-              }}>
-                WHERE INDIA'S{' '}
-                <span style={{ color: 'var(--green-400)', textShadow: '0 0 20px rgba(46,204,55,0.3)' }}>
-                  ELECTRIC REVOLUTION
-                </span>{' '}
-                BEGINS
-              </h2>
-
-              <div style={{ display: 'flex', flexDirection: 'column', gap: 18 }}>
-                {[
-                  `Vidyut 26 is not just an event — it is a movement. Born out of a conviction that India's youth would drive the electric revolution, EVOLVE at NIT Bhopal launched its first EV Day 26 years ago with a single electric scooter on display and a handful of passionate engineers in attendance. Today, Vidyut stands as India's largest student-organised electric vehicle conclave, drawing thousands of visitors, hundreds of competing teams, and dozens of industry partners every year.`,
-                  `Each edition of Vidyut is built around a singular theme — and Vidyut 26 is no different. This year's theme, "Current of Change", captures the moment India finds itself in: a nation on the cusp of a transformational shift in how it powers its roads. From policy tailwinds and falling battery costs to a booming domestic EV startup ecosystem, the conditions for mass electrification have never been more ripe. Vidyut 26 is where that energy converges.`,
-                  `Over three packed days, participants will experience live vehicle showcases, compete in engineering challenges with lakhs in prize money, attend thought-leadership panels, and forge connections with the brightest minds in sustainable mobility. Whether you are a first-year engineering student or a seasoned EV professional, Vidyut 26 has a seat for you at the table — and a charge point for the journey ahead.`,
-                ].map((para, i) => (
-                  <p key={i} style={{
-                    fontFamily: 'var(--font-body)',
-                    fontSize: '0.92rem',
-                    color: i === 0 ? 'var(--text-secondary)' : 'var(--text-muted)',
-                    lineHeight: 1.8,
-                  }}>
-                    {para}
-                  </p>
-                ))}
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* ════════════════════════════
-          EVENTS
-      ════════════════════════════ */}
-      <section className="section" ref={eventsRef} style={{
-        background: 'linear-gradient(180deg, transparent, rgba(15,34,16,0.2), transparent)',
-      }}>
-        <div className="container">
-          <div style={{ textAlign: 'center', marginBottom: 64 }}>
-            <div className="section-label" style={{ justifyContent: 'center' }}>What's Happening</div>
-            <h2 style={{
-              fontFamily: 'var(--font-display)',
-              fontSize: 'clamp(2.5rem, 5vw, 4rem)',
-              letterSpacing: '0.04em',
-            }}>
-              EVENTS &{' '}
-              <span style={{ color: 'var(--green-400)', textShadow: '0 0 20px rgba(46,204,55,0.3)' }}>
-                COMPETITIONS
-              </span>
-            </h2>
-          </div>
-
-          {/* Tab Selector */}
-          <div style={{
-            display: 'flex', gap: 4, flexWrap: 'wrap',
-            marginBottom: 48, justifyContent: 'center',
-          }}>
-            {EVENTS.map((ev, i) => (
-              <button key={ev.id} onClick={() => setActiveEvent(i)}
-                style={{
-                  padding: '8px 20px',
-                  background: activeEvent === i ? 'rgba(46,204,55,0.15)' : 'transparent',
-                  border: activeEvent === i ? 'var(--border-bright)' : 'var(--border)',
-                  borderRadius: 100,
-                  fontFamily: 'var(--font-mono)',
-                  fontSize: '0.6rem',
-                  color: activeEvent === i ? 'var(--green-400)' : 'var(--text-muted)',
-                  letterSpacing: '0.15em',
-                  cursor: 'none',
-                  transition: 'all 0.3s ease',
-                  textTransform: 'uppercase',
-                }}>
-                {ev.id}. {ev.category}
-              </button>
-            ))}
-          </div>
-
-          {/* Active event card */}
-          {EVENTS.map((ev, i) => i === activeEvent && (
-            <div key={ev.id} style={{
-              display: 'grid',
-              gridTemplateColumns: '1fr 1fr',
-              gap: 0,
-              border: 'var(--border)',
-              borderRadius: 12,
-              overflow: 'hidden',
-              opacity: eventsVisible ? 1 : 0,
-              transform: eventsVisible ? 'translateY(0)' : 'translateY(30px)',
-              transition: 'all 0.5s ease',
-            }} className="event-detail">
-
-              {/* Image */}
-              <div style={{ position: 'relative', overflow: 'hidden', minHeight: 400 }}>
-                <img
-                  src={ev.image}
-                  alt={ev.title}
-                  style={{
-                    width: '100%', height: '100%', objectFit: 'cover',
-                    filter: 'brightness(0.6) saturate(0.7) hue-rotate(60deg)',
-                    transition: 'transform 0.6s ease',
-                  }}
-                />
-                <div style={{
-                  position: 'absolute', inset: 0,
-                  background: 'linear-gradient(90deg, transparent 50%, rgba(5,10,5,0.8) 100%)',
-                }} />
-                {/* Category tag on image */}
-                <div style={{
-                  position: 'absolute', top: 24, left: 24,
-                  fontFamily: 'var(--font-mono)',
-                  fontSize: '0.58rem',
-                  color: 'var(--green-400)',
-                  letterSpacing: '0.25em',
-                  padding: '5px 12px',
-                  background: 'rgba(5,10,5,0.8)',
-                  border: 'var(--border-bright)',
-                  borderRadius: 100,
-                }}>
-                  {ev.category}
-                </div>
-                {ev.prize && (
-                  <div style={{
-                    position: 'absolute', bottom: 24, left: 24,
-                    fontFamily: 'var(--font-display)',
-                    fontSize: '1.6rem',
-                    color: '#fbbf24',
-                    textShadow: '0 0 20px rgba(251,191,36,0.4)',
-                  }}>
-                    🏆 {ev.prize}
-                  </div>
-                )}
-              </div>
-
-              {/* Details */}
-              <div style={{
-                padding: '48px 48px',
-                background: 'rgba(10,26,10,0.6)',
-                display: 'flex', flexDirection: 'column', justifyContent: 'center',
-              }}>
-                <div style={{
-                  fontFamily: 'var(--font-mono)',
-                  fontSize: '0.6rem',
-                  color: 'var(--text-muted)',
-                  letterSpacing: '0.25em',
-                  marginBottom: 12,
-                }}>
-                  {ev.id} / {String(EVENTS.length).padStart(2,'0')}
-                </div>
-
-                <h3 style={{
-                  fontFamily: 'var(--font-display)',
-                  fontSize: 'clamp(1.8rem, 3vw, 2.6rem)',
-                  color: 'var(--text-primary)',
-                  letterSpacing: '0.04em',
-                  marginBottom: 20,
-                  lineHeight: 1.1,
-                }}>
-                  {ev.title}
-                </h3>
-
-                <p style={{
-                  fontFamily: 'var(--font-body)',
-                  fontSize: '0.9rem',
-                  color: 'var(--text-muted)',
-                  lineHeight: 1.8,
-                  marginBottom: 28,
-                }}>
-                  {ev.desc}
-                </p>
-
-                {/* Meta */}
-                <div style={{ display: 'flex', gap: 24, flexWrap: 'wrap', marginBottom: 32 }}>
-                  {[
-                    { label: 'DATE', value: ev.date },
-                    { label: 'TIME', value: ev.time },
-                    { label: 'CAPACITY', value: ev.spots },
-                  ].map(m => (
-                    <div key={m.label}>
-                      <div style={{ fontFamily: 'var(--font-mono)', fontSize: '0.52rem', color: 'var(--text-muted)', letterSpacing: '0.2em', marginBottom: 4 }}>{m.label}</div>
-                      <div style={{ fontFamily: 'var(--font-heading)', fontSize: '0.8rem', color: 'var(--green-300)' }}>{m.value}</div>
-                    </div>
-                  ))}
-                </div>
-
+              <div style={{ display: 'flex', gap: 14, flexWrap: 'wrap' }}>
                 <a href="#register">
-                  <button className="btn-glow" style={{ alignSelf: 'flex-start' }}>
-                    <span>Register for this Event</span>
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+                  <button className="btn-primary" style={{ padding: '15px 44px' }}>
+                    <span>Register {'\u2014'} Free Entry</span>
+                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
                       <path d="M5 12h14M12 5l7 7-7 7"/>
                     </svg>
                   </button>
                 </a>
+                <a href="#sponsor">
+                  <button className="btn-ghost">
+                    <span>Sponsor Vidyut 26</span>
+                  </button>
+                </a>
               </div>
             </div>
-          ))}
+
+            <div style={{
+              display:    'flex',
+              gap:        12,
+              marginTop:  52,
+              flexWrap:   'wrap',
+              opacity:    heroVisible ? 1 : 0,
+              transition: 'all 0.8s ease 0.55s',
+            }}>
+              {[
+                { icon: '\uD83D\uDCC5', text: 'March 14\u201316, 2026' },
+                { icon: '\uD83D\uDCCD', text: 'NIT Bhopal, MP'       },
+                { icon: '\uD83C\uDFC6', text: '\u20B96.5L Prize Pool' },
+              ].map(function(pill) {
+                return (
+                  <div key={pill.text} style={{
+                    display:    'flex',
+                    alignItems: 'center',
+                    gap:        8,
+                    padding:    '9px 18px',
+                    background: 'rgba(255,255,255,0.03)',
+                    border:     'var(--border)',
+                    fontFamily: 'var(--font-body)',
+                    fontSize:   '0.82rem',
+                    fontWeight: 300,
+                    color:      'var(--pearl-muted)',
+                  }}>
+                    {pill.text}
+                  </div>
+                );
+              })}
+            </div>
+          </div>
         </div>
       </section>
 
-      {/* ════════════════════════════
-          TIMELINE
-      ════════════════════════════ */}
-      <section className="section" ref={timelineRef}>
+
+      {/* ══════════════════════════════
+          EVENTS
+      ══════════════════════════════ */}
+      <section className="section" ref={eventsRef}>
         <div className="container">
-          <div style={{ textAlign: 'center', marginBottom: 64 }}>
-            <div className="section-label" style={{ justifyContent: 'center' }}>Schedule</div>
+          <div style={{ marginBottom: 48 }}>
+            <div className="eyebrow">Programme</div>
             <h2 style={{
-              fontFamily: 'var(--font-display)',
-              fontSize: 'clamp(2.5rem, 5vw, 4rem)',
-              letterSpacing: '0.04em',
+              fontFamily:  'var(--font-serif)',
+              fontSize:    'clamp(2.2rem, 4vw, 3.6rem)',
+              fontWeight:  300,
+              color:       'var(--pearl)',
+              lineHeight:  1.05,
             }}>
-              THREE DAYS OF{' '}
-              <span style={{ color: 'var(--green-400)' }}>POWER</span>
+              Events {'\u0026'}{' '}
+              <span style={{ fontStyle: 'italic', color: 'var(--copper-light)' }}>
+                Competitions
+              </span>
             </h2>
           </div>
 
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3,1fr)', gap: 24 }}
-            className="timeline-grid">
-            {TIMELINE.map((day, i) => (
-              <div key={day.day} className="card" style={{
-                padding: '40px 32px', borderRadius: 8,
-                opacity: timelineVisible ? 1 : 0,
-                transform: timelineVisible ? 'translateY(0)' : 'translateY(40px)',
-                transition: `all 0.6s ease ${i * 0.15}s`,
-                position: 'relative', overflow: 'hidden',
-              }}>
-                {/* Day number watermark */}
-                <div style={{
-                  position: 'absolute', top: -10, right: 20,
-                  fontFamily: 'var(--font-display)',
-                  fontSize: '7rem', lineHeight: 1,
-                  color: 'rgba(46,204,55,0.04)',
-                  pointerEvents: 'none',
-                  userSelect: 'none',
-                }}>
-                  {i + 1}
-                </div>
-
-                <div style={{
-                  fontFamily: 'var(--font-mono)',
-                  fontSize: '0.58rem', color: 'var(--text-muted)',
-                  letterSpacing: '0.25em', marginBottom: 6,
-                }}>
-                  {day.date}
-                </div>
-                <div style={{
-                  fontFamily: 'var(--font-heading)',
-                  fontSize: '0.75rem', color: 'var(--green-400)',
-                  letterSpacing: '0.1em', marginBottom: 4,
-                }}>
-                  {day.day}
-                </div>
-                <div style={{
-                  fontFamily: 'var(--font-display)',
-                  fontSize: '2rem', color: 'var(--text-primary)',
-                  letterSpacing: '0.06em', marginBottom: 28,
-                }}>
-                  {day.title}
-                </div>
-
-                <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
-                  {day.events.map((ev, j) => (
-                    <div key={ev} style={{
-                      display: 'flex', alignItems: 'center', gap: 12,
-                      opacity: timelineVisible ? 1 : 0,
-                      transition: `opacity 0.4s ease ${i * 0.15 + j * 0.08}s`,
-                    }}>
-                      <div style={{
-                        width: 6, height: 6, borderRadius: '50%',
-                        background: 'var(--green-500)',
-                        boxShadow: '0 0 8px var(--green-500)',
-                        flexShrink: 0,
-                      }} />
-                      <span style={{
-                        fontFamily: 'var(--font-body)',
-                        fontSize: '0.875rem',
-                        color: 'var(--text-secondary)',
-                      }}>
-                        {ev}
-                      </span>
-                    </div>
-                  ))}
-                </div>
-
-                {/* Bottom line */}
-                <div style={{
-                  position: 'absolute', bottom: 0, left: 0, right: 0,
-                  height: 2,
-                  background: `linear-gradient(90deg, var(--green-${700 - i * 100}), transparent)`,
-                }} />
-              </div>
-            ))}
+          {/* Tab strip */}
+          <div style={{
+            display:      'flex',
+            gap:          0,
+            marginBottom: 32,
+            borderBottom: 'var(--border)',
+            overflowX:    'auto',
+          }}>
+            {EVENTS.map(function(ev, i) {
+              var isActive = activeEvent === i;
+              return (
+                <button
+                  key={ev.id}
+                  onClick={function() { setActiveEvent(i); }}
+                  style={{
+                    padding:       '14px 22px',
+                    background:    'transparent',
+                    border:        'none',
+                    borderBottom:  isActive
+                      ? '2px solid var(--copper)'
+                      : '2px solid transparent',
+                    fontFamily:    'var(--font-wide)',
+                    fontSize:      '0.56rem',
+                    fontWeight:    600,
+                    letterSpacing: '0.18em',
+                    textTransform: 'uppercase',
+                    color:         isActive ? 'var(--copper-light)' : 'var(--pearl-ghost)',
+                    cursor:        'none',
+                    whiteSpace:    'nowrap',
+                    transition:    'all 0.3s ease',
+                    marginBottom:  -1,
+                  }}
+                  onMouseEnter={function(e) {
+                    if (!isActive) e.currentTarget.style.color = 'var(--pearl-muted)';
+                  }}
+                  onMouseLeave={function(e) {
+                    if (!isActive) e.currentTarget.style.color = 'var(--pearl-ghost)';
+                  }}
+                >
+                  {ev.id} {'\u2014'} {ev.tag}
+                </button>
+              );
+            })}
           </div>
+
+          {/* Active event panel */}
+          {EVENTS.map(function(ev, i) {
+            if (i !== activeEvent) return null;
+            return (
+              <div key={ev.id} style={{
+                display:             'grid',
+                gridTemplateColumns: '1fr 1fr',
+                gap:                 0,
+                border:              'var(--border)',
+                overflow:            'hidden',
+                opacity:             eventsVisible ? 1 : 0,
+                transform:           eventsVisible ? 'translateY(0)' : 'translateY(24px)',
+                transition:          'all 0.6s ease',
+              }}
+                className="event-panel"
+              >
+                {/* Image */}
+                <div style={{ position: 'relative', overflow: 'hidden', minHeight: 440 }}>
+                  <img
+                    src={ev.image}
+                    alt={ev.title}
+                    style={{
+                      width:      '100%',
+                      height:     '100%',
+                      objectFit:  'cover',
+                      filter:     'brightness(0.5) contrast(1.15) saturate(0.35)',
+                      transition: 'transform 0.8s ease',
+                    }}
+                    onMouseEnter={function(e) { e.currentTarget.style.transform = 'scale(1.04)'; }}
+                    onMouseLeave={function(e) { e.currentTarget.style.transform = 'scale(1)'; }}
+                  />
+                  <div style={{
+                    position:   'absolute',
+                    inset:      0,
+                    background: 'linear-gradient(90deg, transparent 55%, rgba(10,10,11,0.8) 100%)',
+                  }} />
+                  {ev.prize && (
+                    <div style={{
+                      position:   'absolute',
+                      bottom:     28,
+                      left:       28,
+                      padding:    '10px 18px',
+                      background: 'rgba(10,10,11,0.9)',
+                      border:     'var(--border-copper)',
+                      fontFamily: 'var(--font-serif)',
+                      fontSize:   '1.3rem',
+                      fontWeight: 300,
+                      color:      'var(--copper-light)',
+                    }}>
+                      {ev.prize} Prize
+                    </div>
+                  )}
+                </div>
+
+                {/* Details */}
+                <div style={{
+                  padding:        '52px 48px',
+                  background:     'var(--charcoal-2)',
+                  display:        'flex',
+                  flexDirection:  'column',
+                  justifyContent: 'center',
+                }}>
+                  <div style={{
+                    fontFamily:    'var(--font-wide)',
+                    fontSize:      '0.55rem',
+                    fontWeight:    600,
+                    letterSpacing: '0.25em',
+                    color:         'var(--copper)',
+                    textTransform: 'uppercase',
+                    marginBottom:  16,
+                  }}>
+                    {ev.tag}
+                  </div>
+                  <h3 style={{
+                    fontFamily:   'var(--font-serif)',
+                    fontSize:     'clamp(1.8rem, 3vw, 2.4rem)',
+                    fontWeight:   300,
+                    color:        'var(--pearl)',
+                    lineHeight:   1.1,
+                    marginBottom: 20,
+                  }}>
+                    {ev.title}
+                  </h3>
+                  <p style={{
+                    fontFamily:   'var(--font-body)',
+                    fontSize:     '0.88rem',
+                    fontWeight:   300,
+                    color:        'var(--pearl-muted)',
+                    lineHeight:   1.82,
+                    marginBottom: 32,
+                  }}>
+                    {ev.desc}
+                  </p>
+                  <div style={{
+                    display:      'flex',
+                    gap:          32,
+                    flexWrap:     'wrap',
+                    marginBottom: 36,
+                    paddingTop:   24,
+                    borderTop:    'var(--border)',
+                  }}>
+                    {[
+                      { label: 'Date',     value: ev.date  },
+                      { label: 'Time',     value: ev.time  },
+                      { label: 'Capacity', value: ev.seats },
+                    ].map(function(m) {
+                      return (
+                        <div key={m.label}>
+                          <div style={{
+                            fontFamily:    'var(--font-wide)',
+                            fontSize:      '0.5rem',
+                            fontWeight:    600,
+                            letterSpacing: '0.25em',
+                            textTransform: 'uppercase',
+                            color:         'var(--pearl-ghost)',
+                            marginBottom:  5,
+                          }}>
+                            {m.label}
+                          </div>
+                          <div style={{
+                            fontFamily:  'var(--font-body)',
+                            fontSize:    '0.88rem',
+                            fontWeight:  400,
+                            color:       'var(--pearl-dim)',
+                          }}>
+                            {m.value}
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                  <a href="#register">
+                    <button className="btn-primary">
+                      <span>Register for this Event</span>
+                      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+                        <path d="M5 12h14M12 5l7 7-7 7"/>
+                      </svg>
+                    </button>
+                  </a>
+                </div>
+              </div>
+            );
+          })}
         </div>
       </section>
 
-      {/* ════════════════════════════
-          SPONSORS
-      ════════════════════════════ */}
-      <section className="section-sm" ref={sponsorRef} style={{
-        borderTop: 'var(--border)', borderBottom: 'var(--border)',
-        background: 'rgba(10,26,10,0.2)',
+
+      {/* ══════════════════════════════
+          TIMELINE
+      ══════════════════════════════ */}
+      <section className="section" ref={timelineRef} style={{
+        borderTop:    'var(--border)',
+        borderBottom: 'var(--border)',
+        background:   'var(--charcoal-2)',
       }}>
         <div className="container">
-          <div style={{ textAlign: 'center', marginBottom: 48 }}>
-            <div className="section-label" style={{ justifyContent: 'center' }}>Powered By</div>
-            <h3 style={{
-              fontFamily: 'var(--font-display)',
-              fontSize: 'clamp(1.8rem, 3vw, 2.8rem)',
-              letterSpacing: '0.06em', color: 'var(--text-secondary)',
+          <div style={{ marginBottom: 56 }}>
+            <div className="eyebrow">Schedule</div>
+            <h2 style={{
+              fontFamily:  'var(--font-serif)',
+              fontSize:    'clamp(2.2rem, 4vw, 3.6rem)',
+              fontWeight:  300,
+              color:       'var(--pearl)',
+              lineHeight:  1.05,
             }}>
-              OUR SPONSORS & PARTNERS
-            </h3>
+              Three Days of{' '}
+              <span style={{ fontStyle: 'italic', color: 'var(--copper-light)' }}>
+                Pure Electric
+              </span>
+            </h2>
           </div>
-
-          <div style={{ display: 'flex', flexWrap: 'wrap', gap: 16, justifyContent: 'center' }}>
-            {SPONSORS.map((sp, i) => (
-              <div key={sp.name} className="card" style={{
-                padding: '20px 36px', borderRadius: 8,
-                display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 6,
-                minWidth: 160,
-                opacity: sponsorVisible ? 1 : 0,
-                transform: sponsorVisible ? 'translateY(0)' : 'translateY(20px)',
-                transition: `all 0.5s ease ${i * 0.07}s`,
-              }}>
-                <div style={{
-                  fontFamily: 'var(--font-mono)',
-                  fontSize: '0.5rem', letterSpacing: '0.25em',
-                  color: sp.color, marginBottom: 2,
+          <div style={{
+            display:             'grid',
+            gridTemplateColumns: 'repeat(3,1fr)',
+            gap:                 1,
+            background:          'rgba(255,255,255,0.04)',
+          }}
+            className="timeline-grid"
+          >
+            {TIMELINE.map(function(day, i) {
+              return (
+                <div key={day.day} style={{
+                  padding:    '48px 40px',
+                  background: 'var(--charcoal-2)',
+                  opacity:    timelineVisible ? 1 : 0,
+                  transform:  timelineVisible ? 'translateY(0)' : 'translateY(24px)',
+                  transition: 'all 0.6s ease ' + (i * 0.12) + 's',
+                  position:   'relative',
                 }}>
-                  {sp.tier} SPONSOR
+                  <div style={{
+                    position:   'absolute',
+                    top: 0, left: 0, right: 0,
+                    height:     2,
+                    background: day.color,
+                    opacity:    0.5,
+                  }} />
+                  <div style={{
+                    fontFamily:    'var(--font-wide)',
+                    fontSize:      '0.52rem',
+                    fontWeight:    600,
+                    letterSpacing: '0.25em',
+                    textTransform: 'uppercase',
+                    color:         'var(--pearl-ghost)',
+                    marginBottom:  6,
+                  }}>
+                    {day.date}
+                  </div>
+                  <div style={{
+                    fontFamily:    'var(--font-wide)',
+                    fontSize:      '0.6rem',
+                    fontWeight:    700,
+                    letterSpacing: '0.2em',
+                    textTransform: 'uppercase',
+                    color:         day.color,
+                    marginBottom:  4,
+                  }}>
+                    {day.day}
+                  </div>
+                  <div style={{
+                    fontFamily:   'var(--font-serif)',
+                    fontSize:     '2.2rem',
+                    fontWeight:   300,
+                    color:        'var(--pearl)',
+                    marginBottom: 32,
+                    lineHeight:   1,
+                  }}>
+                    {day.title}
+                  </div>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
+                    {day.events.map(function(ev) {
+                      return (
+                        <div key={ev} style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+                          <div style={{
+                            width:      20, height: 1,
+                            background: day.color,
+                            opacity:    0.4, flexShrink: 0,
+                          }} />
+                          <span style={{
+                            fontFamily:  'var(--font-body)',
+                            fontSize:    '0.85rem',
+                            fontWeight:  300,
+                            color:       'var(--pearl-muted)',
+                          }}>
+                            {ev}
+                          </span>
+                        </div>
+                      );
+                    })}
+                  </div>
                 </div>
-                <div style={{
-                  fontFamily: 'var(--font-heading)',
-                  fontSize: '0.85rem', color: 'var(--text-secondary)',
-                  letterSpacing: '0.06em',
-                }}>
-                  {sp.name}
-                </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
         </div>
       </section>
 
-      {/* ════════════════════════════
-          REGISTER FORM
-      ════════════════════════════ */}
-      <section className="section" id="register" ref={registerRef}>
+
+      {/* ══════════════════════════════
+          SPONSOR SIMULATOR
+      ══════════════════════════════ */}
+      <section className="section" id="sponsor" ref={simRef}>
         <div className="container">
           <div style={{
-            maxWidth: 680, margin: '0 auto',
-            opacity: registerVisible ? 1 : 0,
-            transform: registerVisible ? 'translateY(0)' : 'translateY(30px)',
+            opacity:    simVisible ? 1 : 0,
+            transform:  simVisible ? 'translateY(0)' : 'translateY(24px)',
             transition: 'all 0.7s ease',
           }}>
-            <div style={{ textAlign: 'center', marginBottom: 48 }}>
-              <div className="section-label" style={{ justifyContent: 'center' }}>Join The Movement</div>
-              <h2 style={{
-                fontFamily: 'var(--font-display)',
-                fontSize: 'clamp(2.2rem, 4vw, 3.5rem)',
-                letterSpacing: '0.04em',
-              }}>
-                REGISTER FOR{' '}
-                <span style={{ color: 'var(--green-400)' }}>VIDYUT 26</span>
-              </h2>
-              <p style={{
-                fontFamily: 'var(--font-body)',
-                fontSize: '0.9rem', color: 'var(--text-muted)',
-                marginTop: 14, lineHeight: 1.7,
-              }}>
-                Entry is completely free. Fill in your details and secure
-                your spot at India's most electric event of 2026.
-              </p>
-            </div>
-
-            {submitted ? (
-              <div style={{
-                textAlign: 'center', padding: '64px 40px',
-                border: 'var(--border-bright)', borderRadius: 12,
-                background: 'rgba(46,204,55,0.04)',
-              }}>
-                <div style={{ fontSize: '3rem', marginBottom: 16 }}>⚡</div>
-                <div style={{
-                  fontFamily: 'var(--font-display)',
-                  fontSize: '2.2rem', color: 'var(--green-400)',
-                  letterSpacing: '0.06em', marginBottom: 12,
-                }}>
-                  YOU'RE IN!
-                </div>
-                <p style={{
-                  fontFamily: 'var(--font-body)',
-                  color: 'var(--text-muted)', fontSize: '0.9rem', lineHeight: 1.7,
-                }}>
-                  Welcome to Vidyut 26. Check your email for confirmation
-                  and event details. See you on March 14th!
-                </p>
-              </div>
-            ) : (
-              <form onSubmit={handleSubmit} style={{
-                display: 'flex', flexDirection: 'column', gap: 20,
-                padding: '48px', border: 'var(--border)', borderRadius: 12,
-                background: 'rgba(10,26,10,0.4)', backdropFilter: 'blur(12px)',
-                position: 'relative', overflow: 'hidden',
-              }}>
-                {/* Form top glow */}
-                <div style={{
-                  position: 'absolute', top: 0, left: '20%', right: '20%', height: 1,
-                  background: 'linear-gradient(90deg, transparent, rgba(46,204,55,0.5), transparent)',
-                }} />
-
-                {[
-                  { label: 'Full Name', key: 'name', type: 'text', placeholder: 'Your full name' },
-                  { label: 'Email Address', key: 'email', type: 'email', placeholder: 'you@college.edu.in' },
-                  { label: 'College / Institution', key: 'college', type: 'text', placeholder: 'NIT Bhopal, IIT Delhi...' },
-                ].map(field => (
-                  <div key={field.key}>
-                    <label style={{
-                      fontFamily: 'var(--font-mono)',
-                      fontSize: '0.6rem', color: 'var(--text-muted)',
-                      letterSpacing: '0.2em', display: 'block', marginBottom: 8,
-                    }}>
-                      {field.label.toUpperCase()}
-                    </label>
-                    <input
-                      type={field.type}
-                      placeholder={field.placeholder}
-                      value={formData[field.key]}
-                      onChange={e => setFormData(p => ({ ...p, [field.key]: e.target.value }))}
-                      style={{
-                        width: '100%', padding: '14px 16px',
-                        background: 'rgba(5,10,5,0.7)',
-                        border: '1px solid rgba(46,204,55,0.15)',
-                        borderRadius: 6,
-                        color: 'var(--text-primary)',
-                        fontFamily: 'var(--font-body)',
-                        fontSize: '0.9rem', outline: 'none',
-                        transition: 'border-color 0.3s ease',
-                        cursor: 'text',
-                      }}
-                      onFocus={e => e.target.style.borderColor = 'rgba(46,204,55,0.5)'}
-                      onBlur={e  => e.target.style.borderColor = 'rgba(46,204,55,0.15)'}
-                    />
-                  </div>
-                ))}
-
-                {/* Event select */}
-                <div>
-                  <label style={{
-                    fontFamily: 'var(--font-mono)',
-                    fontSize: '0.6rem', color: 'var(--text-muted)',
-                    letterSpacing: '0.2em', display: 'block', marginBottom: 8,
-                  }}>
-                    PRIMARY EVENT INTEREST
-                  </label>
-                  <select
-                    value={formData.event}
-                    onChange={e => setFormData(p => ({ ...p, event: e.target.value }))}
-                    style={{
-                      width: '100%', padding: '14px 16px',
-                      background: 'rgba(5,10,5,0.7)',
-                      border: '1px solid rgba(46,204,55,0.15)',
-                      borderRadius: 6,
-                      color: formData.event ? 'var(--text-primary)' : 'var(--text-muted)',
-                      fontFamily: 'var(--font-body)',
-                      fontSize: '0.9rem', outline: 'none',
-                      cursor: 'none',
-                    }}
-                  >
-                    <option value="">Select an event...</option>
-                    {EVENTS.map(ev => (
-                      <option key={ev.id} value={ev.id}>{ev.title}</option>
-                    ))}
-                  </select>
-                </div>
-
-                <button type="submit" className="btn-glow" style={{
-                  width: '100%', justifyContent: 'center',
-                  padding: '16px', fontSize: '0.8rem', marginTop: 8,
-                }}>
-                  <span>Secure My Spot at Vidyut 26</span>
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
-                    <path d="M5 12h14M12 5l7 7-7 7"/>
-                  </svg>
-                </button>
-
-                <p style={{
-                  fontFamily: 'var(--font-mono)',
-                  fontSize: '0.58rem', color: 'var(--text-muted)',
-                  letterSpacing: '0.1em', textAlign: 'center',
-                }}>
-                  FREE ENTRY — NO REGISTRATION FEE — OPEN TO ALL
-                </p>
-              </form>
-            )}
+            <SponsorSimulator />
           </div>
         </div>
       </section>
 
-      {/* Responsive */}
+
+      {/* ══════════════════════════════
+          REGISTER FORM
+      ══════════════════════════════ */}
+      <section className="section" id="register" ref={registerRef} style={{
+        borderTop:  'var(--border)',
+        background: 'var(--charcoal-2)',
+      }}>
+        <div className="container">
+          <div style={{
+            display:             'grid',
+            gridTemplateColumns: '1fr 1fr',
+            gap:                 80,
+            alignItems:          'start',
+          }}
+            className="register-grid"
+          >
+            {/* Left */}
+            <div style={{
+              opacity:    registerVisible ? 1 : 0,
+              transform:  registerVisible ? 'translateX(0)' : 'translateX(-24px)',
+              transition: 'all 0.7s ease',
+            }}>
+              <div className="eyebrow">Join the Movement</div>
+              <h2 style={{
+                fontFamily:   'var(--font-serif)',
+                fontSize:     'clamp(2.2rem, 4vw, 3.4rem)',
+                fontWeight:   300,
+                color:        'var(--pearl)',
+                lineHeight:   1.05,
+                marginBottom: 24,
+              }}>
+                Register for{' '}
+                <span style={{ fontStyle: 'italic', color: 'var(--copper-light)' }}>
+                  Vidyut 26
+                </span>
+              </h2>
+              <p style={{
+                fontFamily:   'var(--font-body)',
+                fontSize:     '0.9rem',
+                fontWeight:   300,
+                color:        'var(--pearl-muted)',
+                lineHeight:   1.8,
+                marginBottom: 40,
+              }}>
+                Entry is completely free. Secure your spot at India's most
+                ambitious electric vehicle event of 2026. Fill in your details
+                and we will send you everything you need before March 14th.
+              </p>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+                {[
+                  'Free entry — no registration fee whatsoever',
+                  'Open to all students and working professionals',
+                  'Confirmation email within 24 hours',
+                  'Full access to all open sessions and exhibitions',
+                ].map(function(item) {
+                  return (
+                    <div key={item} style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
+                      <div style={{
+                        width:          20, height: 20,
+                        borderRadius:   '50%',
+                        border:         'var(--border-copper)',
+                        display:        'flex',
+                        alignItems:     'center',
+                        justifyContent: 'center',
+                        flexShrink:     0,
+                      }}>
+                        <CheckIcon color="var(--copper)" />
+                      </div>
+                      <span style={{
+                        fontFamily:  'var(--font-body)',
+                        fontSize:    '0.85rem',
+                        fontWeight:  300,
+                        color:       'var(--pearl-muted)',
+                      }}>
+                        {item}
+                      </span>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+
+            {/* Right — form */}
+            <div style={{
+              opacity:    registerVisible ? 1 : 0,
+              transform:  registerVisible ? 'translateX(0)' : 'translateX(24px)',
+              transition: 'all 0.7s ease 0.15s',
+            }}>
+              {submitted ? (
+                <div style={{
+                  padding:    '64px 48px',
+                  background: 'var(--charcoal-3)',
+                  border:     'var(--border-copper)',
+                  textAlign:  'center',
+                }}>
+                  <div style={{
+                    fontFamily:   'var(--font-serif)',
+                    fontSize:     '3.2rem',
+                    fontWeight:   300,
+                    fontStyle:    'italic',
+                    color:        'var(--copper-light)',
+                    marginBottom: 16,
+                    lineHeight:   1,
+                  }}>
+                    You're in.
+                  </div>
+                  <p style={{
+                    fontFamily:  'var(--font-body)',
+                    fontSize:    '0.88rem',
+                    fontWeight:  300,
+                    color:       'var(--pearl-muted)',
+                    lineHeight:  1.75,
+                  }}>
+                    Welcome to Vidyut 26. Check your email for confirmation
+                    and event details. We will see you on March 14th at NIT Bhopal.
+                  </p>
+                </div>
+              ) : (
+                <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
+                  {[
+                    { label: 'Full Name',            key: 'name',    type: 'text',  ph: 'Your full name'         },
+                    { label: 'Email Address',         key: 'email',   type: 'email', ph: 'you@college.edu.in'     },
+                    { label: 'College / Institution', key: 'college', type: 'text',  ph: 'NIT Bhopal, IIT Delhi...' },
+                  ].map(function(field) {
+                    return (
+                      <div key={field.key}>
+                        <label style={{
+                          display:       'block',
+                          fontFamily:    'var(--font-wide)',
+                          fontSize:      '0.52rem',
+                          fontWeight:    600,
+                          letterSpacing: '0.22em',
+                          textTransform: 'uppercase',
+                          color:         'var(--pearl-ghost)',
+                          marginBottom:  8,
+                        }}>
+                          {field.label}
+                        </label>
+                        <input
+                          type={field.type}
+                          placeholder={field.ph}
+                          value={formData[field.key]}
+                          onChange={function(e) { updateForm(field.key, e.target.value); }}
+                          style={{
+                            width:      '100%',
+                            padding:    '13px 16px',
+                            background: 'var(--charcoal-3)',
+                            border:     'var(--border)',
+                            color:      'var(--pearl)',
+                            fontFamily: 'var(--font-body)',
+                            fontSize:   '0.88rem',
+                            fontWeight: 300,
+                            outline:    'none',
+                            cursor:     'text',
+                            transition: 'border-color 0.3s ease',
+                          }}
+                          onFocus={function(e) { e.target.style.borderColor = 'rgba(184,115,51,0.4)'; }}
+                          onBlur={function(e)  { e.target.style.borderColor = 'rgba(255,255,255,0.06)'; }}
+                        />
+                      </div>
+                    );
+                  })}
+
+                  <div>
+                    <label style={{
+                      display:       'block',
+                      fontFamily:    'var(--font-wide)',
+                      fontSize:      '0.52rem',
+                      fontWeight:    600,
+                      letterSpacing: '0.22em',
+                      textTransform: 'uppercase',
+                      color:         'var(--pearl-ghost)',
+                      marginBottom:  8,
+                    }}>
+                      Primary Event Interest
+                    </label>
+                    <select
+                      value={formData.event}
+                      onChange={function(e) { updateForm('event', e.target.value); }}
+                      style={{
+                        width:      '100%',
+                        padding:    '13px 16px',
+                        background: 'var(--charcoal-3)',
+                        border:     'var(--border)',
+                        color:      formData.event ? 'var(--pearl)' : 'var(--pearl-muted)',
+                        fontFamily: 'var(--font-body)',
+                        fontSize:   '0.88rem',
+                        fontWeight: 300,
+                        outline:    'none',
+                        cursor:     'none',
+                      }}
+                    >
+                      <option value="">Select an event...</option>
+                      {EVENTS.map(function(ev) {
+                        return (
+                          <option key={ev.id} value={ev.id}>{ev.title}</option>
+                        );
+                      })}
+                    </select>
+                  </div>
+
+                  <button
+                    type="submit"
+                    className="btn-primary"
+                    style={{ width: '100%', justifyContent: 'center', padding: '15px', fontSize: '0.68rem', marginTop: 8 }}
+                  >
+                    <span>Secure My Spot at Vidyut 26</span>
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+                      <path d="M5 12h14M12 5l7 7-7 7"/>
+                    </svg>
+                  </button>
+
+                  <div style={{
+                    fontFamily:    'var(--font-wide)',
+                    fontSize:      '0.5rem',
+                    fontWeight:    600,
+                    letterSpacing: '0.18em',
+                    textTransform: 'uppercase',
+                    color:         'var(--pearl-ghost)',
+                    textAlign:     'center',
+                  }}>
+                    Free Entry {'\u00B7'} No Registration Fee {'\u00B7'} Open to All
+                  </div>
+                </form>
+              )}
+            </div>
+          </div>
+        </div>
+      </section>
+
       <style>{`
         @media (max-width: 900px) {
-          .about-grid    { grid-template-columns: 1fr !important; gap: 40px !important; }
-          .event-detail  { grid-template-columns: 1fr !important; }
-          .timeline-grid { grid-template-columns: 1fr !important; gap: 20px !important; }
-        }
-        @media (max-width: 600px) {
-          .timeline-grid { grid-template-columns: 1fr !important; }
+          .event-panel    { grid-template-columns: 1fr !important; }
+          .timeline-grid  { grid-template-columns: 1fr !important; }
+          .register-grid  { grid-template-columns: 1fr !important; gap: 48px !important; }
         }
       `}</style>
     </div>
